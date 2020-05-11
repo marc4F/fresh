@@ -5,6 +5,32 @@ import 'package:slylist_project/provider/user_playlists.dart';
 class ScreenProvider extends ChangeNotifier {}
 
 class UserPlaylists extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    final title = 'My Playlists';
+
+    return ChangeNotifierProvider(
+      create: (context) => ScreenProvider(),
+      child: Consumer<ScreenProvider>(
+        builder: (context, p, child) => Scaffold(
+          floatingActionButton: FloatingActionButton(
+              tooltip: 'Select Playlist Type',
+              child: Icon(Icons.playlist_add),
+              onPressed: () async => _onPressedOpenPlaylistDialog(context)),
+          appBar: AppBar(
+            title: Text(title),
+          ),
+          body: Consumer<UserPlaylistsProvider>(
+            builder: (context, p, child) => (p.userPlaylists.length > 0)
+                ? buildListView(p)
+                : buildPlaceholderText(context),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _onPressedOpenPlaylistDialog(context) async {
     return showDialog<void>(
       context: context,
@@ -38,31 +64,6 @@ class UserPlaylists extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final title = 'My Playlists';
-
-    return ChangeNotifierProvider(
-      create: (context) => ScreenProvider(),
-      child: Consumer<ScreenProvider>(
-        builder: (context, p, child) => Scaffold(
-          floatingActionButton: FloatingActionButton(
-              tooltip: 'Select Playlist Type',
-              child: Icon(Icons.playlist_add),
-              onPressed: () async => _onPressedOpenPlaylistDialog(context)),
-          appBar: AppBar(
-            title: Text(title),
-          ),
-          body: Consumer<UserPlaylistsProvider>(
-            builder: (context, p, child) => (p.userPlaylists.length > 0)
-                ? buildListView(p)
-                : buildPlaceholderText(context),
-          ),
-        ),
-      ),
     );
   }
 
