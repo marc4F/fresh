@@ -50,9 +50,8 @@ class UserPlaylists extends StatelessWidget {
             FlatButton(
               child: Text('PLAYLIST FROM TEMPLATE'),
               onPressed: () {
-                Provider.of<UserPlaylistsProvider>(context, listen: false)
-                    .addUserPlaylist();
                 Navigator.of(context).pop();
+                Navigator.pushNamed(context, '/template_playlists');
               },
             ),
             FlatButton(
@@ -76,7 +75,7 @@ class UserPlaylists extends StatelessWidget {
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(
-                  text: "Welcome to SlyList! \n\n",
+                  text: "Welcome to SlyList!\n\n",
                   style: DefaultTextStyle.of(context).style.apply(
                       fontSizeFactor: 1.5,
                       color: Colors.black.withOpacity(0.5))),
