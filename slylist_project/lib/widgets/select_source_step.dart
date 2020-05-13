@@ -15,6 +15,7 @@ class _SelectSourceStepState extends State<SelectSourceStep> {
         builder: (context, screenProvider, playlistStepperProvider, child) {
       return ListView.builder(
         shrinkWrap: true,
+        primary: false,
         itemCount: screenProvider.combinedLists.length,
         itemBuilder: (context, index) {
           return CheckboxListTile(

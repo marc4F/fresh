@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/provider/template_playlists.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
+import 'package:slylist_project/widgets/create_rules_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
 import 'package:slylist_project/provider/spotify_created_playlists.dart';
 
@@ -95,76 +96,78 @@ class _PlaylistStepperState extends State<PlaylistStepperState> {
     return ChangeNotifierProvider(
       create: (context) => PlaylistStepperProvider(),
       child: Consumer<PlaylistStepperProvider>(
-          builder: (context, playlistStepperProvider, child) => Stepper(
-                  steps: [
-                    Step(
-                      title: Text("Select Source"),
-                      content: SelectSourceStep(),
-                      isActive: playlistStepperProvider.activeStep == 0,
-                    ),
-                    Step(
-                      title: Text("Rules"),
-                      content: Text("${playlistStepperProvider.validStep}"),
-                      isActive: playlistStepperProvider.activeStep == 1,
-                    ),
-                    Step(
-                      title: Text("Details"),
-                      content: Text("This is our third example."),
-                      isActive: playlistStepperProvider.activeStep == 2,
-                    )
-                  ],
-                  currentStep: playlistStepperProvider.activeStep,
-                  onStepTapped: (playlistStepperProvider.validStep != 0)
-                      ? null
-                      : (index) => setState(() {
-                            playlistStepperProvider.activeStep = index;
-                          }),
-                  controlsBuilder: (BuildContext context,
-                      {VoidCallback onStepContinue,
-                      VoidCallback onStepCancel}) {
-                    var backButton = FlatButton(
-                      onPressed: () => playlistStepperProvider.activeStep =
-                          playlistStepperProvider.activeStep - 1,
-                      child: const Text('BACK'),
-                    );
-                    var nextButton = FlatButton(
-                      onPressed: playlistStepperProvider.validStep != 0
-                          ? null
-                          : () => playlistStepperProvider.activeStep =
-                              playlistStepperProvider.activeStep + 1,
-                      child: const Text('NEXT'),
-                      color: Theme.of(context).accentColor,
-                      textColor: Colors.white,
-                    );
-                    var previewButton = FlatButton(
-                      onPressed: () => print("preview"),
-                      child: const Text('PREVIEW'),
-                    );
-                    var saveButton = FlatButton(
-                      onPressed: () => print("save"),
-                      child: const Text('SAVE'),
-                      color: Theme.of(context).primaryColor,
-                      textColor: Colors.white,
-                    );
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Visibility(
-                            child: backButton,
-                            visible: playlistStepperProvider.activeStep != 0),
-                        Visibility(
-                            child: nextButton,
-                            visible: playlistStepperProvider.activeStep != 2),
-                        Spacer(),
-                        Visibility(
-                            child: previewButton,
-                            visible: playlistStepperProvider.activeStep == 2),
-                        Visibility(
-                            child: saveButton,
-                            visible: playlistStepperProvider.activeStep == 2)
-                      ],
-                    );
-                  })),
+          builder: (context, playlistStepperProvider, child) => SizedBox.expand(
+                child: Stepper(
+                    steps: [
+                      Step(
+                        title: Text("Select Source"),
+                        content: SelectSourceStep(),
+                        isActive: playlistStepperProvider.activeStep == 0,
+                      ),
+                      Step(
+                        title: Text("Rules"),
+                        content: CreateRulesStep(),
+                        isActive: playlistStepperProvider.activeStep == 1,
+                      ),
+                      Step(
+                        title: Text("Details"),
+                        content: Text("This is our third example."),
+                        isActive: playlistStepperProvider.activeStep == 2,
+                      )
+                    ],
+                    currentStep: playlistStepperProvider.activeStep,
+                    onStepTapped: (playlistStepperProvider.validStep != 0)
+                        ? null
+                        : (index) => setState(() {
+                              playlistStepperProvider.activeStep = index;
+                            }),
+                    controlsBuilder: (BuildContext context,
+                        {VoidCallback onStepContinue,
+                        VoidCallback onStepCancel}) {
+                      var backButton = FlatButton(
+                        onPressed: () => playlistStepperProvider.activeStep =
+                            playlistStepperProvider.activeStep - 1,
+                        child: const Text('BACK'),
+                      );
+                      var nextButton = FlatButton(
+                        onPressed: playlistStepperProvider.validStep != 0
+                            ? null
+                            : () => playlistStepperProvider.activeStep =
+                                playlistStepperProvider.activeStep + 1,
+                        child: const Text('NEXT'),
+                        color: Theme.of(context).accentColor,
+                        textColor: Colors.white,
+                      );
+                      var previewButton = FlatButton(
+                        onPressed: () => print("preview"),
+                        child: const Text('PREVIEW'),
+                      );
+                      var saveButton = FlatButton(
+                        onPressed: () => print("save"),
+                        child: const Text('SAVE'),
+                        color: Theme.of(context).primaryColor,
+                        textColor: Colors.white,
+                      );
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Visibility(
+                              child: backButton,
+                              visible: playlistStepperProvider.activeStep != 0),
+                          Visibility(
+                              child: nextButton,
+                              visible: playlistStepperProvider.activeStep != 2),
+                          Spacer(),
+                          Visibility(
+                              child: previewButton,
+                              visible: playlistStepperProvider.activeStep == 2),
+                          Visibility(
+                              child: saveButton,
+                              visible: playlistStepperProvider.activeStep == 2)
+                        ],
+                      );
+                    }),
+              )),
     );
   }
 }
