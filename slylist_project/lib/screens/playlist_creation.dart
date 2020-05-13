@@ -85,12 +85,7 @@ class PlaylistStepperProvider extends ChangeNotifier {
   }
 }
 
-class PlaylistStepperState extends StatefulWidget {
-  @override
-  _PlaylistStepperState createState() => _PlaylistStepperState();
-}
-
-class _PlaylistStepperState extends State<PlaylistStepperState> {
+class PlaylistStepperState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -118,9 +113,7 @@ class _PlaylistStepperState extends State<PlaylistStepperState> {
                     currentStep: playlistStepperProvider.activeStep,
                     onStepTapped: (playlistStepperProvider.validStep != 0)
                         ? null
-                        : (index) => setState(() {
-                              playlistStepperProvider.activeStep = index;
-                            }),
+                        : (index) => playlistStepperProvider.activeStep = index,
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
                         VoidCallback onStepCancel}) {

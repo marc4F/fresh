@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/screens/playlist_creation.dart';
 
-class CreateRulesStep extends StatefulWidget {
-  @override
-  _CreateRulesStepState createState() => _CreateRulesStepState();
-}
 
-class _CreateRulesStepState extends State<CreateRulesStep> {
+class CreateRulesStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer2<ScreenProvider, PlaylistStepperProvider>(
