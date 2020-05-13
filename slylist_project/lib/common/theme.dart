@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 
 final appTheme = ThemeData(
-  visualDensity: VisualDensity.adaptivePlatformDensity,
-  textTheme: TextTheme(
-    headline2: TextStyle(
-      fontFamily: 'Corben',
-      fontWeight: FontWeight.w700,
-      fontSize: 24,
-      color: Colors.black,
-    ),
-  ),
+    //visualDensity: VisualDensity.adaptivePlatformDensity,
+    // Define the default brightness and colors.
+    primaryColor: Colors.green,
+    accentColor: Colors.blue
 );

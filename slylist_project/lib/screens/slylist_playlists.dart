@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/provider/user_playlists.dart';
+import 'package:slylist_project/provider/slylist_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
-class UserPlaylists extends StatelessWidget {
-  
+class SlylistPlaylists extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = 'My Playlists';
@@ -14,15 +13,21 @@ class UserPlaylists extends StatelessWidget {
       create: (context) => ScreenProvider(),
       child: Consumer<ScreenProvider>(
         builder: (context, p, child) => Scaffold(
-          floatingActionButton: FloatingActionButton(
-              tooltip: 'Select Playlist Type',
-              child: Icon(Icons.playlist_add),
-              onPressed: () async => _onPressedOpenPlaylistDialog(context)),
+          floatingActionButton: Container(
+            height: 100,
+            width: 100,
+            child: FittedBox(
+              child: FloatingActionButton(
+                  tooltip: 'Select Playlist Type',
+                  child: Icon(Icons.playlist_add),
+                  onPressed: () async => _onPressedOpenPlaylistDialog(context)),
+            ),
+          ),
           appBar: AppBar(
             title: Text(title),
           ),
-          body: Consumer<UserPlaylistsProvider>(
-            builder: (context, p, child) => (p.userPlaylists.length > 0)
+          body: Consumer<SlylistPlaylistsProvider>(
+            builder: (context, p, child) => (p.slylistPlaylists.length > 0)
                 ? buildListView(p)
                 : buildPlaceholderText(context),
           ),
@@ -42,7 +47,8 @@ class UserPlaylists extends StatelessWidget {
             child: ListBody(
               children: <Widget>[
                 Text('Use one of our awesome templates to create a playlist.'),
-                Text('Or be creative, and make a playlist after your own custom rules.'),
+                Text(
+                    'Or be creative, and make a playlist after your own custom rules.'),
               ],
             ),
           ),
@@ -58,6 +64,7 @@ class UserPlaylists extends StatelessWidget {
               child: Text('PLAYLIST FROM CUSTOM RULES'),
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.pushNamed(context, '/playlist_creation');
               },
             ),
           ],
@@ -96,12 +103,12 @@ class UserPlaylists extends StatelessWidget {
     );
   }
 
-  ListView buildListView(UserPlaylistsProvider p) {
+  ListView buildListView(SlylistPlaylistsProvider p) {
     return ListView.builder(
-      itemCount: p.userPlaylists.length,
+      itemCount: p.slylistPlaylists.length,
       itemBuilder: (context, index) {
         return ListTile(
-          title: Text('${p.userPlaylists[index].name}'),
+          title: Text('${p.slylistPlaylists[index].name}'),
         );
       },
     );
