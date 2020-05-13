@@ -5,8 +5,7 @@ import 'package:slylist_project/screens/playlist_creation.dart';
 class SelectSourceStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ScreenProvider, PlaylistStepperProvider>(
-        builder: (context, screenProvider, playlistStepperProvider, child) {
+    return Consumer<ScreenProvider>(builder: (context, screenProvider, child) {
       return ListView.builder(
         shrinkWrap: true,
         primary: false,
@@ -18,15 +17,19 @@ class SelectSourceStep extends StatelessWidget {
               onChanged: (bool isSelected) {
                 screenProvider.combinedLists[index]['isSelected'] = isSelected;
                 if (index == 0) {
-                  screenProvider.selectAllSources(isSelected);
+                  screenProvider.changeSelectAllSources(isSelected);
                 } else {
-                  if (!isSelected)
+                  if (!isSelected) {
                     screenProvider.combinedLists[0]['isSelected'] = false;
+                  } else if (screenProvider
+                      .selectMissingOnSelectAllCheckbox()) {
+                    screenProvider.combinedLists[0]['isSelected'] = true;
+                  }
                 }
                 if (screenProvider.hasSelectedSource()) {
-                  playlistStepperProvider.validStep = 0;
+                  screenProvider.validStep = 0;
                 } else {
-                  playlistStepperProvider.validStep = null;
+                  screenProvider.validStep = null;
                 }
               });
         },

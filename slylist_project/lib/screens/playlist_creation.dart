@@ -8,10 +8,30 @@ import 'package:slylist_project/provider/spotify_created_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {
   List _combinedLists = [];
+  int _activeStep = 0;
+  int _validStep;
 
   List get combinedLists => _combinedLists;
+  int get validStep => _validStep;
+  int get activeStep => _activeStep;
 
-  combineLists(List spotifyCreatedPlaylists, List slylistPlaylists) {
+  set validStep(int validStep) {
+    _validStep = validStep;
+    notifyListeners();
+  }
+  set activeStep(int activeStep) {
+    _activeStep = activeStep;
+    notifyListeners();
+  }
+
+  ScreenProvider(
+      SpotifyCreatedPlaylistsProvider spotifyCreatedPlaylistsProvider,
+      SlylistPlaylistsProvider slylistPlaylistsProvider) {
+    _combineLists(spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
+        slylistPlaylistsProvider.slylistPlaylists);
+  }
+
+  _combineLists(List spotifyCreatedPlaylists, List slylistPlaylists) {
     _combinedLists = [
       {'name': 'Complete Library', 'isSelected': false},
       {'name': 'Liked Artists', 'isSelected': false},
@@ -28,7 +48,7 @@ class ScreenProvider extends ChangeNotifier {
     }
   }
 
-  void selectAllSources(bool isSelected) {
+  void changeSelectAllSources(bool isSelected) {
     for (int i = 0; i < _combinedLists.length; i++) {
       _combinedLists[i]['isSelected'] = isSelected;
     }
@@ -42,91 +62,67 @@ class ScreenProvider extends ChangeNotifier {
     }
     return false;
   }
+
+  bool selectMissingOnSelectAllCheckbox(){
+    for (int i = 1; i < _combinedLists.length; i++) {
+      if (!_combinedLists[i]['isSelected']) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 }
 
 class PlaylistCreation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => ScreenProvider(),
+      create: (context) => ScreenProvider(
+          Provider.of<SpotifyCreatedPlaylistsProvider>(context, listen: false),
+          Provider.of<SlylistPlaylistsProvider>(context, listen: false)),
       child: Scaffold(
           appBar: AppBar(
             title: Text("Create Playlist"),
           ),
-          body: Consumer3<ScreenProvider, SpotifyCreatedPlaylistsProvider,
-              SlylistPlaylistsProvider>(
-            builder: (context, screenProvider, spotifyCreatedPlaylistsProvider,
-                slylistPlaylistsProvider, child) {
-              screenProvider.combineLists(
-                  spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
-                  slylistPlaylistsProvider.slylistPlaylists);
-              return PlaylistStepperState();
-            },
-          )),
-    );
-  }
-}
-
-class PlaylistStepperProvider extends ChangeNotifier {
-  int _validStep;
-  int _activeStep = 0;
-
-  int get validStep => _validStep;
-  int get activeStep => _activeStep;
-
-  set validStep(int validStep) {
-    _validStep = validStep;
-    notifyListeners();
-  }
-
-  set activeStep(int activeStep) {
-    _activeStep = activeStep;
-    notifyListeners();
-  }
-}
-
-class PlaylistStepperState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => PlaylistStepperProvider(),
-      child: Consumer<PlaylistStepperProvider>(
-          builder: (context, playlistStepperProvider, child) => SizedBox.expand(
+          body: Consumer<ScreenProvider>(
+            builder: (context, screenProvider, child) {
+              return SizedBox.expand(
                 child: Stepper(
                     steps: [
                       Step(
                         title: Text("Select Source"),
                         content: SelectSourceStep(),
-                        isActive: playlistStepperProvider.activeStep == 0,
+                        isActive: screenProvider.activeStep == 0,
                       ),
                       Step(
                         title: Text("Rules"),
                         content: CreateRulesStep(),
-                        isActive: playlistStepperProvider.activeStep == 1,
+                        isActive: screenProvider.activeStep == 1,
                       ),
                       Step(
                         title: Text("Details"),
                         content: Text("This is our third example."),
-                        isActive: playlistStepperProvider.activeStep == 2,
+                        isActive: screenProvider.activeStep == 2,
                       )
                     ],
-                    currentStep: playlistStepperProvider.activeStep,
-                    onStepTapped: (playlistStepperProvider.validStep != 0)
+                    currentStep: screenProvider.activeStep,
+                    onStepTapped: (screenProvider.validStep != 0)
                         ? null
-                        : (index) => playlistStepperProvider.activeStep = index,
+                        : (index) => screenProvider.activeStep = index,
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
                         VoidCallback onStepCancel}) {
                       var backButton = FlatButton(
-                        onPressed: () => playlistStepperProvider.activeStep =
-                            playlistStepperProvider.activeStep - 1,
+                        onPressed: () => screenProvider.activeStep =
+                            screenProvider.activeStep - 1,
                         child: const Text('BACK'),
                       );
                       var nextButton = FlatButton(
-                        onPressed: playlistStepperProvider.validStep != 0
+                        onPressed: screenProvider.validStep != 0
                             ? null
-                            : () => playlistStepperProvider.activeStep =
-                                playlistStepperProvider.activeStep + 1,
+                            : () => screenProvider.activeStep =
+                                screenProvider.activeStep + 1,
                         child: const Text('NEXT'),
                         color: Theme.of(context).accentColor,
                         textColor: Colors.white,
@@ -146,21 +142,23 @@ class PlaylistStepperState extends StatelessWidget {
                         children: <Widget>[
                           Visibility(
                               child: backButton,
-                              visible: playlistStepperProvider.activeStep != 0),
+                              visible: screenProvider.activeStep != 0),
                           Visibility(
                               child: nextButton,
-                              visible: playlistStepperProvider.activeStep != 2),
+                              visible: screenProvider.activeStep != 2),
                           Spacer(),
                           Visibility(
                               child: previewButton,
-                              visible: playlistStepperProvider.activeStep == 2),
+                              visible: screenProvider.activeStep == 2),
                           Visibility(
                               child: saveButton,
-                              visible: playlistStepperProvider.activeStep == 2)
+                              visible: screenProvider.activeStep == 2)
                         ],
                       );
                     }),
-              )),
+              );
+            },
+          )),
     );
   }
 }

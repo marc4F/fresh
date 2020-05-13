@@ -6,8 +6,8 @@ import 'package:slylist_project/screens/playlist_creation.dart';
 class CreateRulesStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ScreenProvider, PlaylistStepperProvider>(
-        builder: (context, screenProvider, playlistStepperProvider, child) {
+    return Consumer<ScreenProvider>(
+        builder: (context, screenProvider, child) {
       return ListView.builder(
         primary: false,
         shrinkWrap: true,
