@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slylist_project/models/group.dart';
+import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/provider/template_playlists.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 import 'package:slylist_project/widgets/create_rules_step.dart';
@@ -8,10 +10,12 @@ import 'package:slylist_project/provider/spotify_created_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {
   List _combinedLists = [];
+  List<Group> _groups = [];
   int _activeStep = 0;
   int _validStep;
 
   List get combinedLists => _combinedLists;
+  List get groups => _groups;
   int get validStep => _validStep;
   int get activeStep => _activeStep;
 
@@ -19,6 +23,7 @@ class ScreenProvider extends ChangeNotifier {
     _validStep = validStep;
     notifyListeners();
   }
+
   set activeStep(int activeStep) {
     _activeStep = activeStep;
     notifyListeners();
@@ -29,6 +34,8 @@ class ScreenProvider extends ChangeNotifier {
       SlylistPlaylistsProvider slylistPlaylistsProvider) {
     _combineLists(spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
         slylistPlaylistsProvider.slylistPlaylists);
+    createGroup(1);
+    print('create group');
   }
 
   _combineLists(List spotifyCreatedPlaylists, List slylistPlaylists) {
@@ -48,6 +55,8 @@ class ScreenProvider extends ChangeNotifier {
     }
   }
 
+  void createGroup(int index) => _groups.add(new Group(index));
+
   void changeSelectAllSources(bool isSelected) {
     for (int i = 0; i < _combinedLists.length; i++) {
       _combinedLists[i]['isSelected'] = isSelected;
@@ -63,7 +72,7 @@ class ScreenProvider extends ChangeNotifier {
     return false;
   }
 
-  bool selectMissingOnSelectAllCheckbox(){
+  bool selectMissingOnSelectAllCheckbox() {
     for (int i = 1; i < _combinedLists.length; i++) {
       if (!_combinedLists[i]['isSelected']) {
         return false;
@@ -72,6 +81,15 @@ class ScreenProvider extends ChangeNotifier {
     return true;
   }
 
+  void addRule(Group group){
+    group.addRule();
+    notifyListeners();
+  }
+
+  void changeRule(Rule rule, String name){
+    rule.changeRule(name);
+    notifyListeners();
+  }
 }
 
 class PlaylistCreation extends StatelessWidget {

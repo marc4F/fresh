@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:slylist_project/models/playlist.dart';
 
@@ -8,13 +6,10 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
   final List<Playlist> _playlists = [];
 
   SlylistPlaylistsProvider() {
-    Timer(Duration(seconds: 10), () {
-      Playlist pl1 = Playlist();
-      pl1.name = "Slylist Playlist 1";
-      _playlists.add(pl1);
-      notifyListeners();
-      print("10 sec");
-    });
+      //Playlist pl1 = Playlist();
+      //pl1.name = "Slylist Playlist 1";
+      //_playlists.add(pl1);
+      //notifyListeners();
   }
 
   List<Playlist> get slylistPlaylists => _playlists;
