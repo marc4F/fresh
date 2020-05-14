@@ -1,7 +1,7 @@
 const ruleCatalogue = [
   {
     'name': 'Play Count',
-    'conditions': ['comparer', 'intValue'],
+    'conditions': ['compare', 'intValue'],
     'active' : true
   },
   {

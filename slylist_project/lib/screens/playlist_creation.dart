@@ -9,13 +9,11 @@ import 'package:slylist_project/widgets/select_source_step.dart';
 import 'package:slylist_project/provider/spotify_created_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {
-  List _combinedLists = [];
-  List<Group> _groups = [];
+  List combinedLists = [];
+  List<Group> groups = [];
   int _activeStep = 0;
   int _validStep;
 
-  List get combinedLists => _combinedLists;
-  List get groups => _groups;
   int get validStep => _validStep;
   int get activeStep => _activeStep;
 
@@ -39,33 +37,33 @@ class ScreenProvider extends ChangeNotifier {
   }
 
   _combineLists(List spotifyCreatedPlaylists, List slylistPlaylists) {
-    _combinedLists = [
+    combinedLists = [
       {'name': 'Complete Library', 'isSelected': false},
       {'name': 'Liked Artists', 'isSelected': false},
       {'name': 'Liked Albums', 'isSelected': false},
       {'name': 'Liked Songs', 'isSelected': false},
     ];
     for (int i = 0; i < spotifyCreatedPlaylists.length; i++) {
-      _combinedLists
+      combinedLists
           .add({'name': spotifyCreatedPlaylists[i].name, 'isSelected': false});
     }
     for (int i = 0; i < slylistPlaylists.length; i++) {
-      _combinedLists
+      combinedLists
           .add({'name': slylistPlaylists[i].name, 'isSelected': false});
     }
   }
 
-  void createGroup(int index) => _groups.add(new Group(index));
+  void createGroup(int index) => groups.add(new Group(index));
 
   void changeSelectAllSources(bool isSelected) {
-    for (int i = 0; i < _combinedLists.length; i++) {
-      _combinedLists[i]['isSelected'] = isSelected;
+    for (int i = 0; i < combinedLists.length; i++) {
+      combinedLists[i]['isSelected'] = isSelected;
     }
   }
 
   bool hasSelectedSource() {
-    for (int i = 0; i < _combinedLists.length; i++) {
-      if (_combinedLists[i]['isSelected']) {
+    for (int i = 0; i < combinedLists.length; i++) {
+      if (combinedLists[i]['isSelected']) {
         return true;
       }
     }
@@ -73,8 +71,8 @@ class ScreenProvider extends ChangeNotifier {
   }
 
   bool selectMissingOnSelectAllCheckbox() {
-    for (int i = 1; i < _combinedLists.length; i++) {
-      if (!_combinedLists[i]['isSelected']) {
+    for (int i = 1; i < combinedLists.length; i++) {
+      if (!combinedLists[i]['isSelected']) {
         return false;
       }
     }
@@ -124,6 +122,7 @@ class PlaylistCreation extends StatelessWidget {
                         isActive: screenProvider.activeStep == 2,
                       )
                     ],
+                    type: StepperType.horizontal,
                     currentStep: screenProvider.activeStep,
                     onStepTapped: (screenProvider.validStep != 0)
                         ? null

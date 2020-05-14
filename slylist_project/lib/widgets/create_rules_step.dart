@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/common/rule_catalogue.dart';
+import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/screens/playlist_creation.dart';
+import 'package:slylist_project/widgets/conditions/compare.dart';
+import 'package:slylist_project/widgets/conditions/int_value.dart';
 
 class CreateRulesStep extends StatelessWidget {
   @override
@@ -15,7 +18,7 @@ class CreateRulesStep extends StatelessWidget {
             primary: false,
             shrinkWrap: true,
             itemCount: screenProvider.groups.length,
-            itemBuilder: (context, index1) {
+            itemBuilder: (context, groupIndex) {
               return Card(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -28,27 +31,15 @@ class CreateRulesStep extends StatelessWidget {
                     ListView.builder(
                         primary: false,
                         shrinkWrap: true,
-                        itemCount: screenProvider.groups[index1].rules.length,
-                        itemBuilder: (context, index2) {
+                        itemCount:
+                            screenProvider.groups[groupIndex].rules.length,
+                        itemBuilder: (context, ruleIndex) {
                           return Row(
-                            children: <Widget>[
-                              DropdownButton<String>(
-                                value: screenProvider
-                                    .groups[index1].rules[index2].name,
-                                onChanged: (String newValue) {
-                                  screenProvider.changeRule(
-                                      screenProvider
-                                          .groups[index1].rules[index2],
-                                      newValue);
-                                },
-                                items: ruleCatalogue.map((value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value['name'],
-                                    child: Text(value['name']),
-                                  );
-                                }).toList(),
-                              )
-                            ],
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: buildRule(
+                                screenProvider,
+                                screenProvider
+                                    .groups[groupIndex].rules[ruleIndex]),
                           );
                         }),
                     Row(
@@ -56,7 +47,7 @@ class CreateRulesStep extends StatelessWidget {
                         FlatButton(
                             child: const Text('ADD RULE'),
                             onPressed: () => screenProvider
-                                .addRule(screenProvider.groups[index1])),
+                                .addRule(screenProvider.groups[groupIndex])),
                         Spacer(),
                         FlatButton(
                           child: const Text('REMOVE'),
@@ -72,5 +63,39 @@ class CreateRulesStep extends StatelessWidget {
         ],
       );
     });
+  }
+
+  List<Widget> buildRule(ScreenProvider screenProvider, Rule rule) {
+    List<Widget> ruleWidgets = [];
+    var ruleSelection = DropdownButton<String>(
+      value: rule.name,
+      onChanged: (String newValue) {
+        screenProvider.changeRule(rule, newValue);
+      },
+      items: ruleCatalogue.map((value) {
+        return DropdownMenuItem<String>(
+          value: value['name'],
+          child: Text(value['name']),
+        );
+      }).toList(),
+    );
+    ruleWidgets.add(ruleSelection);
+    rule.conditions.forEach((condition) =>
+        ruleWidgets.add(createWidgetforCondition(rule, condition)));
+    return ruleWidgets;
+  }
+}
+
+Widget createWidgetforCondition(rule, condition) {
+  switch (condition['type']) {
+    case 'compare':
+      {
+        return Compare(rule: rule);
+      }
+    case 'intValue':
+      {
+        return IntValue(rule: rule);
+      }
+      break;
   }
 }
