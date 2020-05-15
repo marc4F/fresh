@@ -13,6 +13,7 @@ class Rule {
     name = newRuleName;
     ruleCatalogue.forEach((rule) {
       if (rule['name'] == name) {
+        conditions = [];
         setConditionsToDefault(rule['conditions']);
       }
     });
