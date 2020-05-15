@@ -1,17 +1,18 @@
 import 'package:slylist_project/models/rule.dart';
 
-enum GroupStatus { matchAny, matchAll }
-
 class Group {
-  String name = "Group";
-  GroupStatus groupStatus = GroupStatus.matchAny;
   List<Rule> rules = [];
+  String match = 'MATCH ANY';
 
-  Group(int index) {
-    name = name + " " + index.toString();
+  void addRule() {
+    rules.add(new Rule());
   }
 
-  void addRule(){
-    rules.add(new Rule());
+  void removeRule(String id) {
+    rules.removeWhere((rule) => rule.id == id);
+  }
+
+  void changeMatch() {
+    (match == 'MATCH ANY') ? match = 'MATCH ALL' : match = 'MATCH ANY';
   }
 }

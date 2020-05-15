@@ -1,19 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:slylist_project/common/enums.dart';
 import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/screens/playlist_creation.dart';
-
-class IntValueProvider extends ChangeNotifier {
-/*   String _dropdownValue = "is";
-
-  get dropdownValue => _dropdownValue;
-
-  set dropdownValue(newValue) {
-    _dropdownValue = newValue;
-    notifyListeners();
-  } */
-}
 
 class IntValue extends StatelessWidget {
   final Rule rule;
@@ -22,18 +12,23 @@ class IntValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => IntValueProvider(),
-      child: Consumer2<ScreenProvider, IntValueProvider>(
-          builder: (context, screenProvider, intValueProvider, child) {
-        return Container(
-            constraints: BoxConstraints(maxWidth: 80),
-            child: TextFormField(
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  WhitelistingTextInputFormatter.digitsOnly
-                ]));
-      }),
-    );
+    return Consumer<ScreenProvider>(builder: (context, screenProvider, child) {
+      var condition = rule.conditions
+          .firstWhere((condition) => condition['type'] == Conditions.intValue);
+      String value;
+      if(condition['value'] == null){
+        value = '';
+      }else{
+        value = condition['value'];
+      }
+      return TextField(
+          controller: TextEditingController(text: "$value"),
+          onSubmitted: (String value) => screenProvider.changeConditionValue(
+              rule, Conditions.intValue, value),
+          keyboardType: TextInputType.number,
+          inputFormatters: <TextInputFormatter>[
+            WhitelistingTextInputFormatter.digitsOnly
+          ]);
+    });
   }
 }

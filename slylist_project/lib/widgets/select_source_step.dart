@@ -26,6 +26,7 @@ class SelectSourceStep extends StatelessWidget {
                     screenProvider.combinedLists[0]['isSelected'] = true;
                   }
                 }
+                // State gets updated here. So changeSelectAllSources can be called without notifylisteners.
                 if (screenProvider.hasSelectedSource()) {
                   screenProvider.validStep = 0;
                 } else {
