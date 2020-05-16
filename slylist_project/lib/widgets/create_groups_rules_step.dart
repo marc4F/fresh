@@ -151,15 +151,15 @@ class CreateGroupsRulesStep extends StatelessWidget {
     ruleWidgets.add(Expanded(
         child: Padding(
       child: ruleSelection,
-      padding: const EdgeInsets.fromLTRB(8, 8, 0, 0),
+      padding: const EdgeInsets.fromLTRB(10, 3, 0, 0),
     )));
     List conditions = rule.conditions;
     for (int i = 0; i < conditions.length; i++) {
       EdgeInsets padding;
       if (i == conditions.length - 1) {
-        padding = const EdgeInsets.fromLTRB(8, 8, 8, 0);
+        padding = const EdgeInsets.fromLTRB(10, 3, 10, 0);
       } else {
-        padding = const EdgeInsets.fromLTRB(8, 8, 0, 0);
+        padding = const EdgeInsets.fromLTRB(10, 3, 0, 0);
       }
       ruleWidgets.add(Expanded(
           child: Padding(

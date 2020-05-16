@@ -16,16 +16,17 @@ class IntValue extends StatelessWidget {
       var condition = rule.conditions
           .firstWhere((condition) => condition['type'] == Conditions.intValue);
       String value;
-      if(condition['value'] == null){
+      if (condition['value'] == null) {
         value = '';
-      }else{
+      } else {
         value = condition['value'];
       }
       return TextField(
           controller: TextEditingController(text: "$value"),
-          onSubmitted: (String value) => screenProvider.changeConditionValue(
-              rule, Conditions.intValue, value),
+          onChanged: (String value) => screenProvider.changeConditionValue(
+              rule, Conditions.intValue, value, false),
           keyboardType: TextInputType.number,
+          decoration: InputDecoration(hintText: 'Number', isDense: true),
           inputFormatters: <TextInputFormatter>[
             WhitelistingTextInputFormatter.digitsOnly
           ]);

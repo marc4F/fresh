@@ -6,6 +6,7 @@ import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/provider/template_playlists.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
+import 'package:slylist_project/widgets/details_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
 import 'package:slylist_project/provider/spotify_created_playlists.dart';
 
@@ -15,6 +16,24 @@ class ScreenProvider extends ChangeNotifier {
   int _activeStep = 0;
   int _validStep;
   String _match = "MATCH ANY";
+  List sortings = [
+    'Random',
+    'Most Popular',
+    'Least Popular',
+    'Most Played',
+    'Least Played',
+    'Most Recently Added',
+    'Least Recently Added',
+    'Most Recently Played',
+    'Least Recently Played',
+    'Release Date - Ascending',
+    'Release Date - Descending'
+  ];
+  String _selectedSorting = 'Random';
+  bool _isPlaylistPublic = true;
+  bool _isPlaylistSynced = true;
+  String playlistName = '';
+  String songLimit = '';
 
   ScreenProvider(
       SpotifyCreatedPlaylistsProvider spotifyCreatedPlaylistsProvider,
@@ -22,6 +41,20 @@ class ScreenProvider extends ChangeNotifier {
     _combineLists(spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
         slylistPlaylistsProvider.slylistPlaylists);
     addGroup();
+  }
+
+  bool get isPlaylistSynced => _isPlaylistSynced;
+
+  set isPlaylistSynced(bool isPlaylistSynced) {
+    _isPlaylistSynced = isPlaylistSynced;
+    notifyListeners();
+  }
+
+  bool get isPlaylistPublic => _isPlaylistPublic;
+
+  set isPlaylistPublic(bool isPlaylistPublic) {
+    _isPlaylistPublic = isPlaylistPublic;
+    notifyListeners();
   }
 
   String get match => _match;
@@ -41,6 +74,13 @@ class ScreenProvider extends ChangeNotifier {
 
   set activeStep(int activeStep) {
     _activeStep = activeStep;
+    notifyListeners();
+  }
+
+  String get selectedSorting => _selectedSorting;
+
+  set selectedSorting(String selectedSorting) {
+    _selectedSorting = selectedSorting;
     notifyListeners();
   }
 
@@ -115,9 +155,13 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeConditionValue(Rule rule, Conditions type, value) {
+  void changeConditionValue(Rule rule, Conditions type, value, bool repaint) {
     rule.changeConditionValue(type, value);
-    notifyListeners();
+
+    // Some widgets should not trigger repaint if they change. 
+    // Like the textfield, that loses focus, when it gets repainted.
+    // Others like bottom sheet need to be repainted, to reflect new state.
+    if(repaint) notifyListeners();
   }
 }
 
@@ -149,7 +193,7 @@ class PlaylistCreation extends StatelessWidget {
                       ),
                       Step(
                         title: Text("Details"),
-                        content: Text("This is our third example."),
+                        content: DetailsStep(),
                         isActive: screenProvider.activeStep == 2,
                       )
                     ],
