@@ -169,6 +169,8 @@ class ScreenProvider extends ChangeNotifier {
         .map<String>((element) => element['name'])
         .toList();
     int adjustedSongLimit = int.tryParse(songLimit);
+    // If the user inputs nothing, some invalid shit, or number higher max value, then set value to max.
+    // Spotify gives max for playlists of 10000 songs.
     if((adjustedSongLimit == null) || (adjustedSongLimit > 10000)){
       adjustedSongLimit = 10000;
     }
