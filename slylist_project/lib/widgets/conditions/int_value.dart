@@ -21,12 +21,12 @@ class IntValue extends StatelessWidget {
       } else {
         value = condition['value'];
       }
-      return TextField(
-          controller: TextEditingController(text: "$value"),
+      return TextFormField(
           onChanged: (String value) => screenProvider.changeConditionValue(
-              rule, Conditions.intValue, value, false),
+              rule, Conditions.intValue, value),
           keyboardType: TextInputType.number,
           decoration: InputDecoration(hintText: 'Number', isDense: true),
+          initialValue: value,
           inputFormatters: <TextInputFormatter>[
             WhitelistingTextInputFormatter.digitsOnly
           ]);

@@ -11,15 +11,20 @@ class DetailsStep extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextField(
-                  controller: TextEditingController(
-                      text: "${screenProvider.playlistName}"),
-                  onChanged: (String playlistName) => screenProvider.playlistName = playlistName,
-                  decoration: InputDecoration(
-                    labelText: 'Playlist Name',
-                  )),
-            ),
+                padding: const EdgeInsets.only(bottom: 16.0),
+                // We need to wrap the input in a statefulwidget. Else the cursor will fuck up on repaint.
+                child: TextFormField(
+                  onChanged: (String playlistName) {
+                    screenProvider.playlistName = playlistName;
+                    if (playlistName != '') {
+                      screenProvider.updateValidSteps('step_2', true);
+                    }else{
+                      screenProvider.updateValidSteps('step_2', false);
+                    }
+                  },
+                  initialValue: screenProvider.playlistName,
+                  decoration: InputDecoration(labelText: 'Playlist Name *'),
+                )),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: DropdownButtonFormField<String>(
@@ -39,12 +44,11 @@ class DetailsStep extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextField(
+              child: TextFormField(
                   decoration: InputDecoration(labelText: 'Song Limit'),
-                  controller: TextEditingController(
-                      text: "${screenProvider.songLimit}"),
                   onChanged: (String songLimit) =>
                       screenProvider.songLimit = songLimit,
+                  initialValue: screenProvider.songLimit,
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
                     WhitelistingTextInputFormatter.digitsOnly

@@ -42,8 +42,7 @@ class Compare extends StatelessWidget {
                         screenProvider.changeConditionValue(
                             rule,
                             Conditions.compare,
-                            conditionOption,
-                            true);
+                            conditionOption);
                         Navigator.pop(context);
                       },
                       selected: conditionOption == condition['value'],

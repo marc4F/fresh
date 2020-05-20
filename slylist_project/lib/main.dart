@@ -22,21 +22,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Using MultiProvider to provide every screen access to all playlist types
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => SlylistPlaylistsProvider()),
-        ChangeNotifierProvider(create: (context) => TemplatePlaylistsProvider()),
-        ChangeNotifierProvider(create: (context) => SpotifyCreatedPlaylistsProvider())
-      ],
-      child: MaterialApp(
-        title: 'Provider Demo',
-        theme: appTheme,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => SlylistPlaylists(),
-          '/template_playlists': (context) => TemplatePlaylists(),
-          '/playlist_creation': (context) => PlaylistCreation()
-        },
+    return GestureDetector(
+      onTap: () {
+        // When clicking outside of keyboard, the keyboard will go away
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+      },
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+              create: (context) => SlylistPlaylistsProvider()),
+          ChangeNotifierProvider(
+              create: (context) => TemplatePlaylistsProvider()),
+          ChangeNotifierProvider(
+              create: (context) => SpotifyCreatedPlaylistsProvider())
+        ],
+        child: MaterialApp(
+          title: 'Slylist',
+          theme: appTheme,
+          initialRoute: '/',
+          routes: {
+            '/': (context) => SlylistPlaylists(),
+            '/template_playlists': (context) => TemplatePlaylists(),
+            '/playlist_creation': (context) => PlaylistCreation()
+          },
+        ),
       ),
     );
   }

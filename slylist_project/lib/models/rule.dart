@@ -8,6 +8,7 @@ class Rule {
   List conditions = [];
 
   Rule() {
+    //Sets the rule to default first entry of rule catalogue
     name = ruleCatalogue[0]['name'];
     setConditionsToDefault(ruleCatalogue[0]['conditions']);
     // Generate a (time-based) unique id

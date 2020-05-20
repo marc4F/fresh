@@ -14,7 +14,8 @@ class ScreenProvider extends ChangeNotifier {
   List combinedLists = [];
   List<Group> groups = [];
   int _activeStep = 0;
-  int _validStep;
+  Map _validSteps = {"step_0": false, "step_2": false};
+  SlylistPlaylistsProvider _slylistPlaylistsProvider;
   String _match = "MATCH ANY";
   List sortings = [
     'Random',
@@ -40,6 +41,7 @@ class ScreenProvider extends ChangeNotifier {
       SlylistPlaylistsProvider slylistPlaylistsProvider) {
     _combineLists(spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
         slylistPlaylistsProvider.slylistPlaylists);
+    _slylistPlaylistsProvider = slylistPlaylistsProvider;
     addGroup();
   }
 
@@ -64,13 +66,14 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get validStep => _validStep;
-  int get activeStep => _activeStep;
+  Map get validSteps => _validSteps;
 
-  set validStep(int validStep) {
-    _validStep = validStep;
+  updateValidSteps(String key, bool value) {
+    _validSteps[key] = value;
     notifyListeners();
   }
+
+  int get activeStep => _activeStep;
 
   set activeStep(int activeStep) {
     _activeStep = activeStep;
@@ -155,17 +158,37 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeConditionValue(Rule rule, Conditions type, value, bool repaint) {
+  void changeConditionValue(Rule rule, Conditions type, value) {
     rule.changeConditionValue(type, value);
+    notifyListeners();
+  }
 
-    // Some widgets should not trigger repaint if they change. 
-    // Like the textfield, that loses focus, when it gets repainted.
-    // Others like bottom sheet need to be repainted, to reflect new state.
-    if(repaint) notifyListeners();
+  void savePlaylist(context) {
+    List<String> selectedPlaylists = combinedLists
+        .where((element) => element['isSelected'])
+        .map<String>((element) => element['name'])
+        .toList();
+    int adjustedSongLimit = int.tryParse(songLimit);
+    if((adjustedSongLimit == null) || (adjustedSongLimit > 10000)){
+      adjustedSongLimit = 10000;
+    }
+    _slylistPlaylistsProvider.createPlaylist(playlistName, selectedPlaylists,
+        groups, _match, adjustedSongLimit, _selectedSorting, _isPlaylistPublic, _isPlaylistSynced);
+    Navigator.pushNamed(context, '/');
   }
 }
 
 class PlaylistCreation extends StatelessWidget {
+  setStepIfAllowed(int index, ScreenProvider screenProvider) {
+    if (screenProvider.activeStep == 0 && screenProvider.validSteps['step_0']) {
+      screenProvider.activeStep = index;
+    } else {
+      if (screenProvider.activeStep != 0) {
+        screenProvider.activeStep = index;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -199,9 +222,8 @@ class PlaylistCreation extends StatelessWidget {
                     ],
                     type: StepperType.horizontal,
                     currentStep: screenProvider.activeStep,
-                    onStepTapped: (screenProvider.validStep != 0)
-                        ? null
-                        : (index) => screenProvider.activeStep = index,
+                    onStepTapped: (index) =>
+                        setStepIfAllowed(index, screenProvider),
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
                         VoidCallback onStepCancel}) {
@@ -211,10 +233,8 @@ class PlaylistCreation extends StatelessWidget {
                         child: const Text('BACK'),
                       );
                       var nextButton = FlatButton(
-                        onPressed: screenProvider.validStep != 0
-                            ? null
-                            : () => screenProvider.activeStep =
-                                screenProvider.activeStep + 1,
+                        onPressed: !screenProvider.validSteps['step_0'] ? null : () => setStepIfAllowed(
+                            screenProvider.activeStep + 1, screenProvider),
                         child: const Text('NEXT'),
                         color: Theme.of(context).accentColor,
                         textColor: Colors.white,
@@ -224,7 +244,9 @@ class PlaylistCreation extends StatelessWidget {
                         child: const Text('PREVIEW'),
                       );
                       var saveButton = FlatButton(
-                        onPressed: () => print("save"),
+                        onPressed: !screenProvider.validSteps['step_2']
+                            ? null
+                            : () => screenProvider.savePlaylist(context),
                         child: const Text('SAVE'),
                         color: Theme.of(context).primaryColor,
                         textColor: Colors.white,
