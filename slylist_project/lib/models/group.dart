@@ -6,7 +6,10 @@ class Group {
 
   Group();
 
-  Group.clone(Group originalGroup, List<Rule> rules){
+  Group.clone(Group originalGroup) {
+    List<Rule> rules = [];
+    originalGroup.rules
+        .forEach((originalRule) => rules.add(Rule.clone(originalRule)));
     this.rules = rules;
     match = originalGroup.match;
   }

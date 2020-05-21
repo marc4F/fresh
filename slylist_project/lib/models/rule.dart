@@ -18,12 +18,10 @@ class Rule {
   Rule.clone(Rule originalRule) {
     id = originalRule.id;
     name = originalRule.name;
-    for (var i = 0; i < originalRule.conditions.length; i++) {
-      conditions.add({
-        'type': originalRule.conditions[i]['type'],
-        'value': originalRule.conditions[i]['value']
-      });
-    }
+    originalRule.conditions.forEach((originalCondition) => conditions.add({
+          'type': originalCondition['type'],
+          'value': originalCondition['value']
+        }));
   }
 
   changeRule(String newRuleName) {

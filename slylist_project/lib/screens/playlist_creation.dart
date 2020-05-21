@@ -120,13 +120,9 @@ class ScreenProvider extends ChangeNotifier {
 
   void _initStepsWithExistingPlaylist(Playlist playlist) {
     
-    for(var i = 0; i < playlist.groups.length; i++){
-      List<Rule> rules = [];
-      for(var k = 0; k < playlist.groups[i].rules.length; k++){
-        rules.add(Rule.clone(playlist.groups[i].rules[k]));
-      }
-      groups.add(Group.clone(playlist.groups[i], rules));
-    }
+    // Deep clone all groups(including rules and conditions)
+    // Because user must be able to discard playlist creation, and rules then need to be reset.
+    playlist.groups.forEach((originalGroup) => groups.add(Group.clone(originalGroup)));
 
     _validSteps = {"step_0": true, "step_2": true};
     _match = playlist.groupsMatch;
