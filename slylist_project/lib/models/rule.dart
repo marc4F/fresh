@@ -15,6 +15,17 @@ class Rule {
     id = Uuid().v1(); // -> '6c84fb90-12c4-11e1-840d-7b25c5ee775a'
   }
 
+  Rule.clone(Rule originalRule) {
+    id = originalRule.id;
+    name = originalRule.name;
+    for (var i = 0; i < originalRule.conditions.length; i++) {
+      conditions.add({
+        'type': originalRule.conditions[i]['type'],
+        'value': originalRule.conditions[i]['value']
+      });
+    }
+  }
+
   changeRule(String newRuleName) {
     name = newRuleName;
     ruleCatalogue.forEach((rule) {

@@ -119,7 +119,15 @@ class ScreenProvider extends ChangeNotifier {
   }
 
   void _initStepsWithExistingPlaylist(Playlist playlist) {
-    groups = []..addAll(playlist.groups);
+    
+    for(var i = 0; i < playlist.groups.length; i++){
+      List<Rule> rules = [];
+      for(var k = 0; k < playlist.groups[i].rules.length; k++){
+        rules.add(Rule.clone(playlist.groups[i].rules[k]));
+      }
+      groups.add(Group.clone(playlist.groups[i], rules));
+    }
+
     _validSteps = {"step_0": true, "step_2": true};
     _match = playlist.groupsMatch;
     _selectedSorting = playlist.sort;

@@ -4,6 +4,13 @@ class Group {
   List<Rule> rules = [];
   String match = 'MATCH ANY';
 
+  Group();
+
+  Group.clone(Group originalGroup, List<Rule> rules){
+    this.rules = rules;
+    match = originalGroup.match;
+  }
+
   void addRule() {
     rules.add(new Rule());
   }
