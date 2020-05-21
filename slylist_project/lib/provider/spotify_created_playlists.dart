@@ -6,9 +6,9 @@ class SpotifyCreatedPlaylistsProvider extends ChangeNotifier {
   final List<Playlist> spotifyCreatedPlaylists = [];
 
   SpotifyCreatedPlaylistsProvider() {
-    Playlist pl1 = Playlist();
-    pl1.name = "Spotify Playlist 1";
-    spotifyCreatedPlaylists.add(pl1);
+    //Playlist pl1 = Playlist();
+    //pl1.name = "Spotify Playlist 1";
+    //spotifyCreatedPlaylists.add(pl1);
     notifyListeners();
   }
 }

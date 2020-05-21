@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {}
@@ -108,6 +109,8 @@ class SlylistPlaylists extends StatelessWidget {
       itemCount: p.slylistPlaylists.length,
       itemBuilder: (context, index) {
         return ListTile(
+          onTap: () => Navigator.pushNamed(context, '/playlist_creation',
+              arguments: p.slylistPlaylists[index]),
           title: Text('${p.slylistPlaylists[index].name}'),
         );
       },

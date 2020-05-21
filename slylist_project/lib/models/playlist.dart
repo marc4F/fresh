@@ -9,15 +9,42 @@ class Playlist {
   String sort;
   bool isPublic;
   bool isSynced;
-  String id;
 
   Playlist(
-      {this.name,
-      this.sources,
-      this.groups,
-      this.groupsMatch,
-      this.songLimit,
-      this.sort,
-      this.isPublic,
-      this.isSynced});
+      String name,
+      List<String> sources,
+      List<Group> groups,
+      String groupsMatch,
+      int songLimit,
+      String sort,
+      bool isPublic,
+      bool isSynced) {
+    this.name = name;
+    this.sources = sources;
+    this.groups = groups;
+    this.groupsMatch = groupsMatch;
+    this.songLimit = songLimit;
+    this.sort = sort;
+    this.isPublic = isPublic;
+    this.isSynced = isSynced;
+  }
+
+  updatePlaylist(
+      String name,
+      List<String> sources,
+      List<Group> groups,
+      String groupsMatch,
+      int songLimit,
+      String sort,
+      bool isPublic,
+      bool isSynced) {
+    this.name = name;
+    this.sources = sources;
+    this.groups = groups;
+    this.groupsMatch = groupsMatch;
+    this.songLimit = songLimit;
+    this.sort = sort;
+    this.isPublic = isPublic;
+    this.isSynced = isSynced;
+  }
 }

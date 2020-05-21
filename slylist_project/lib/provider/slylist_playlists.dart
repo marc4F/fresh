@@ -13,16 +13,32 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
     //notifyListeners();
   }
 
-  createPlaylist(String name, List<String> sources, List<Group> groups,
-      String groupsMatch, int songLimit, String sort, bool isPublic, bool isSynced) {
-    slylistPlaylists.add(new Playlist(
-        name: name,
-        sources: sources,
-        groups: groups,
-        groupsMatch: groupsMatch,
-        songLimit: songLimit,
-        sort: sort,
-        isPublic: isPublic,
-        isSynced: isSynced));
+  createPlaylist(
+      String name,
+      List<String> sources,
+      List<Group> groups,
+      String groupsMatch,
+      int songLimit,
+      String sort,
+      bool isPublic,
+      bool isSynced) {
+    slylistPlaylists.add(new Playlist(name, sources, groups, groupsMatch,
+        songLimit, sort, isPublic, isSynced));
+        notifyListeners();
+  }
+
+  updatePlaylist(
+      Playlist existingPlaylist,
+      String name,
+      List<String> sources,
+      List<Group> groups,
+      String groupsMatch,
+      int songLimit,
+      String sort,
+      bool isPublic,
+      bool isSynced) {
+    existingPlaylist.updatePlaylist(name, sources, groups, groupsMatch,
+        songLimit, sort, isPublic, isSynced);
+        notifyListeners();
   }
 }

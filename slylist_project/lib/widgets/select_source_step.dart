@@ -9,21 +9,21 @@ class SelectSourceStep extends StatelessWidget {
       return ListView.builder(
         shrinkWrap: true,
         primary: false,
-        itemCount: screenProvider.combinedLists.length,
+        itemCount: screenProvider.sources.length,
         itemBuilder: (context, index) {
           return CheckboxListTile(
-              title: Text('${screenProvider.combinedLists[index]['name']}'),
-              value: screenProvider.combinedLists[index]['isSelected'],
+              title: Text('${screenProvider.sources[index]['name']}'),
+              value: screenProvider.sources[index]['isSelected'],
               onChanged: (bool isSelected) {
-                screenProvider.combinedLists[index]['isSelected'] = isSelected;
+                screenProvider.sources[index]['isSelected'] = isSelected;
                 if (index == 0) {
                   screenProvider.changeSelectAllSources(isSelected);
                 } else {
                   if (!isSelected) {
-                    screenProvider.combinedLists[0]['isSelected'] = false;
+                    screenProvider.sources[0]['isSelected'] = false;
                   } else if (screenProvider
                       .selectMissingOnSelectAllCheckbox()) {
-                    screenProvider.combinedLists[0]['isSelected'] = true;
+                    screenProvider.sources[0]['isSelected'] = true;
                   }
                 }
                 // State gets updated here. So changeSelectAllSources can be called without notifylisteners.

@@ -34,7 +34,7 @@ class DetailsStep extends StatelessWidget {
                 onChanged: (String selectedSorting) {
                   screenProvider.selectedSorting = selectedSorting;
                 },
-                items: screenProvider.sortings.map((sorting) {
+                items: ScreenProvider.sortings.map((sorting) {
                   return DropdownMenuItem<String>(
                     value: sorting,
                     child: Text(sorting),
