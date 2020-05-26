@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/common/const.dart';
-import 'package:slylist_project/common/enums.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/models/rule.dart';
@@ -11,6 +10,7 @@ import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
 import 'package:slylist_project/provider/spotify_created_playlists.dart';
+import 'dart:convert';
 
 class ScreenProvider extends ChangeNotifier {
   static const List sortings = [
@@ -119,10 +119,10 @@ class ScreenProvider extends ChangeNotifier {
   }
 
   void _initStepsWithExistingPlaylist(Playlist playlist) {
-    
     // Deep clone all groups(including rules and conditions)
-    // Because user must be able to discard playlist creation, and rules then need to be reset.
-    playlist.groups.forEach((originalGroup) => groups.add(Group.clone(originalGroup)));
+    // Because user must be able to discard playlist creation, a fresh copy is needed.
+    playlist.groups.forEach(
+        (originalGroup) => groups.add(Group.fromJson(json.decode(json.encode(originalGroup.toJson())))));
 
     _validSteps = {"step_0": true, "step_2": true};
     _match = playlist.groupsMatch;
@@ -207,7 +207,7 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeConditionValue(Rule rule, Conditions type, value) {
+  void changeConditionValue(Rule rule, String type, value) {
     rule.changeConditionValue(type, value);
     notifyListeners();
   }

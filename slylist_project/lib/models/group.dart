@@ -1,18 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:slylist_project/models/rule.dart';
 
+part 'group.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Group {
   List<Rule> rules = [];
   String match = 'MATCH ANY';
 
   Group();
-
-  Group.clone(Group originalGroup) {
-    List<Rule> rules = [];
-    originalGroup.rules
-        .forEach((originalRule) => rules.add(Rule.clone(originalRule)));
-    this.rules = rules;
-    match = originalGroup.match;
-  }
 
   void addRule() {
     rules.add(new Rule());
@@ -25,4 +21,8 @@ class Group {
   void changeMatch() {
     (match == 'MATCH ANY') ? match = 'MATCH ALL' : match = 'MATCH ANY';
   }
+
+  factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
+
+  Map<String, dynamic> toJson() => _$GroupToJson(this);
 }

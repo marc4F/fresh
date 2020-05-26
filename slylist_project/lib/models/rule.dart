@@ -1,7 +1,10 @@
-import 'package:slylist_project/common/enums.dart';
 import 'package:slylist_project/common/rule_catalogue.dart';
 import 'package:uuid/uuid.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'rule.g.dart';
+
+@JsonSerializable()
 class Rule {
   String id;
   String name;
@@ -15,15 +18,6 @@ class Rule {
     id = Uuid().v1(); // -> '6c84fb90-12c4-11e1-840d-7b25c5ee775a'
   }
 
-  Rule.clone(Rule originalRule) {
-    id = originalRule.id;
-    name = originalRule.name;
-    originalRule.conditions.forEach((originalCondition) => conditions.add({
-          'type': originalCondition['type'],
-          'value': originalCondition['value']
-        }));
-  }
-
   changeRule(String newRuleName) {
     name = newRuleName;
     ruleCatalogue.forEach((rule) {
@@ -34,16 +28,20 @@ class Rule {
     });
   }
 
-  setConditionsToDefault(List catalogueConditions) {
+  setConditionsToDefault(List<String> catalogueConditions) {
     catalogueConditions
         .forEach((type) => conditions.add({'type': type, 'value': null}));
   }
 
-  changeConditionValue(Conditions type, value) {
+  changeConditionValue(String type, value) {
     for (var i = 0; i < conditions.length; i++) {
       if (type == conditions[i]['type']) {
         conditions[i]['value'] = value;
       }
     }
   }
+
+  factory Rule.fromJson(Map<String, dynamic> json) => _$RuleFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RuleToJson(this);
 }

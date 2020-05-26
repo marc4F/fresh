@@ -1,4 +1,0 @@
-enum Conditions { 
-   compare, 
-   intValue
-}

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/common/enums.dart';
 import 'package:slylist_project/common/rule_catalogue.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/rule.dart';
@@ -188,11 +187,11 @@ class CreateGroupsRulesStep extends StatelessWidget {
 
 Widget createWidgetforCondition(rule, condition) {
   switch (condition['type']) {
-    case Conditions.compare:
+    case 'compare':
       {
         return Compare(rule: rule);
       }
-    case Conditions.intValue:
+    case 'intValue':
       {
         return IntValue(rule: rule);
       }

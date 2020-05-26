@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/common/enums.dart';
 import 'package:slylist_project/common/rule_catalogue.dart';
 import 'package:slylist_project/common/custom_colors.dart';
 import 'package:slylist_project/models/rule.dart';
@@ -16,7 +15,7 @@ class Compare extends StatelessWidget {
     return Consumer<ScreenProvider>(
         builder: (context, screenProvider, child) {
       var condition = rule.conditions.firstWhere(
-          (condition) => condition['type'] == Conditions.compare);
+          (condition) => condition['type'] == 'compare');
       if (condition['value'] == null) condition['value'] = "is";
       return FlatButton(
         color: Theme.of(context).colorScheme.ruleButton,
@@ -31,23 +30,23 @@ class Compare extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 height: MediaQuery.of(context).size.height / 3,
                 child: ListView.separated(
-                  itemCount: conditionOptions[Conditions.compare]
+                  itemCount: conditionOptions['compare']
                           ['options']
                       .length,
                   itemBuilder: (context, index) {
-                    String conditionOption = conditionOptions[Conditions.compare]
+                    String conditionOption = conditionOptions['compare']
                         ['options'][index];
                     return ListTile(
                       onTap: () {
                         screenProvider.changeConditionValue(
                             rule,
-                            Conditions.compare,
+                            'compare',
                             conditionOption);
                         Navigator.pop(context);
                       },
                       selected: conditionOption == condition['value'],
                       title: Text(
-                          '${conditionOptions[Conditions.compare]['options'][index]}'),
+                          '${conditionOptions['compare']['options'][index]}'),
                     );
                   },
                   separatorBuilder: (context, index) {
