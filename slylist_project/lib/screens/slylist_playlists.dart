@@ -47,9 +47,9 @@ class SlylistPlaylists extends StatelessWidget {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Use one of our awesome templates to create a playlist.'),
+                Text('Use one of our awesome templates.'),
                 Text(
-                    'Or be creative, and make a playlist after your own custom rules.'),
+                    'Or be creative, and use custom rules.'),
               ],
             ),
           ),
@@ -80,9 +80,9 @@ class SlylistPlaylists extends StatelessWidget {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Can't delete playlist in slylist"),
+          title: Text("Can't delete playlist"),
           content: Text(
-              "Please go to spotify, to delete playlists."),
+              "Please use spotify, to delete playlists."),
           actions: <Widget>[
             FlatButton(
               child: Text('OK'),
