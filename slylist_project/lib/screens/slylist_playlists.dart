@@ -40,7 +40,7 @@ class SlylistPlaylists extends StatelessWidget {
   Future<void> _onPressedOpenPlaylistDialog(context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: true, // user must tap button!
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Select Playlist Type'),
@@ -68,6 +68,28 @@ class SlylistPlaylists extends StatelessWidget {
                 Navigator.pushNamed(context, '/playlist_creation');
               },
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _onPressedOpenDeleteDialog(context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Can't delete playlist in slylist"),
+          content: Text(
+              "Please go to spotify, to delete playlists."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
           ],
         );
       },
@@ -109,8 +131,22 @@ class SlylistPlaylists extends StatelessWidget {
       itemCount: p.slylistPlaylists.length,
       itemBuilder: (context, index) {
         return ListTile(
-          onTap: () => Navigator.pushNamed(context, '/playlist_creation',
-              arguments: p.slylistPlaylists[index]),
+          trailing: PopupMenuButton<int>(
+            onSelected: (menuValue) => (menuValue == 1)
+                ? Navigator.pushNamed(context, '/playlist_creation',
+                    arguments: p.slylistPlaylists[index])
+                : _onPressedOpenDeleteDialog(context),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: Text("Edit"),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Text("Delete"),
+              )
+            ],
+          ),
           title: Text('${p.slylistPlaylists[index].name}'),
         );
       },

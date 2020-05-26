@@ -252,7 +252,7 @@ class ScreenProvider extends ChangeNotifier {
           _isPlaylistPublic,
           _isPlaylistSynced);
     }
-    Navigator.pushNamed(context, '/');
+    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 }
 
