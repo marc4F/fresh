@@ -4,11 +4,13 @@ import 'package:slylist_project/common/enums.dart';
 const ruleCatalogue = [
   {
     'name': 'Play Count',
-    'conditions': [Conditions.compare, Conditions.intValue]
+    'conditions': [Conditions.compare, Conditions.intValue],
+    'info':''
   },
   {
     'name': 'Total Duration',
-    'conditions': [Conditions.intValue]
+    'conditions': [Conditions.intValue],
+    'info':'Some information for total duration'
   }
 ];
 

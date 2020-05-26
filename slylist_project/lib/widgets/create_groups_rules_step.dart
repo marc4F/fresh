@@ -49,6 +49,7 @@ class CreateGroupsRulesStep extends StatelessWidget {
                         itemCount: group.rules.length,
                         itemBuilder: (context, ruleIndex) {
                           final Rule rule = group.rules[ruleIndex];
+                          final String ruleInfo = ruleCatalogue.firstWhere((catRule) => catRule['name'] == rule.name)['info'];
                           return Dismissible(
                             key: Key(rule.id),
                             direction: DismissDirection.endToStart,
@@ -64,9 +65,23 @@ class CreateGroupsRulesStep extends StatelessWidget {
                                   Icons.delete,
                                   color: Colors.white,
                                 )),
-                            child: Row(
-                              children:
-                                  buildRule(context, screenProvider, rule),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  children:
+                                      buildRule(context, screenProvider, rule),
+                                ),
+                                Visibility(
+                                  visible: ruleInfo != '',
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                        "Info: $ruleInfo",
+                                        textScaleFactor: 0.7),
+                                  ),
+                                )
+                              ],
                             ),
                           );
                         }),
@@ -151,15 +166,15 @@ class CreateGroupsRulesStep extends StatelessWidget {
     ruleWidgets.add(Expanded(
         child: Padding(
       child: ruleSelection,
-      padding: const EdgeInsets.fromLTRB(10, 3, 0, 0),
+      padding: const EdgeInsets.only(left: 10),
     )));
     List conditions = rule.conditions;
     for (int i = 0; i < conditions.length; i++) {
       EdgeInsets padding;
       if (i == conditions.length - 1) {
-        padding = const EdgeInsets.fromLTRB(10, 3, 10, 0);
+        padding = const EdgeInsets.fromLTRB(10, 0, 10, 0);
       } else {
-        padding = const EdgeInsets.fromLTRB(10, 3, 0, 0);
+        padding = const EdgeInsets.only(left: 10);
       }
       ruleWidgets.add(Expanded(
           child: Padding(
