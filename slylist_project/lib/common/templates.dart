@@ -1,6 +1,7 @@
 const List<Map<String, dynamic>> templatePlaylistsJson = [
   {
     "name": "Long Songs I played once",
+    "description": "This is a awesome template for some awesome people",
     "sources": ["Complete Library"],
     "groups": [
       {

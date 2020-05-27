@@ -33,7 +33,7 @@ class TemplatePlaylists extends StatelessWidget {
             children: <Widget>[
               ListTile(
                 title: Text('${p.templatePlaylists[index].name}'),
-                subtitle: Text('Filter1, Filter2, Filter3....'),
+                subtitle: Text('${p.templatePlaylists[index].description}'),
               ),
               ButtonBar(
                 children: <Widget>[

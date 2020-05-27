@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'playlist.dart';
+part of 'slylist.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Playlist _$PlaylistFromJson(Map<String, dynamic> json) {
-  return Playlist(
+Slylist _$SlylistFromJson(Map<String, dynamic> json) {
+  return Slylist(
     json['name'] as String,
     (json['sources'] as List)?.map((e) => e as String)?.toList(),
     (json['groups'] as List)
@@ -22,7 +22,7 @@ Playlist _$PlaylistFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$PlaylistToJson(Playlist instance) => <String, dynamic>{
+Map<String, dynamic> _$SlylistToJson(Slylist instance) => <String, dynamic>{
       'name': instance.name,
       'sources': instance.sources,
       'groups': instance.groups?.map((e) => e?.toJson())?.toList(),

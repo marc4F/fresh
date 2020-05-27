@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/common/const.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/models/rule.dart';
-import 'package:slylist_project/provider/template_playlists.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';

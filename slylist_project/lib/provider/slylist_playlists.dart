@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:slylist_project/models/group.dart';
-import 'package:slylist_project/models/playlist.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:slylist_project/models/slylist.dart';
 
 //Playlists that where created from our app
 class SlylistPlaylistsProvider extends ChangeNotifier {
-  final List<Playlist> slylistPlaylists = [];
+  final List<Slylist> slylistPlaylists = [];
 
   SlylistPlaylistsProvider() {
     loadAllPlaylists();
@@ -22,14 +22,14 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
       String sort,
       bool isPublic,
       bool isSynced) {
-    slylistPlaylists.add(new Playlist(name, sources, groups, groupsMatch,
+    slylistPlaylists.add(new Slylist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced));
     saveAllPlaylists();
     notifyListeners();
   }
 
   updatePlaylist(
-      Playlist existingPlaylist,
+      Slylist existingPlaylist,
       String name,
       List<String> sources,
       List<Group> groups,
@@ -57,11 +57,16 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
   }
 
   loadAllPlaylists() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> slylistPlaylistsAsJsonString =
-        prefs.getStringList('SlylistPlaylists');
-    slylistPlaylistsAsJsonString.forEach((slylistPlaylist) =>
-        slylistPlaylists.add(Playlist.fromJson(json.decode(slylistPlaylist))));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> slylistPlaylistsAsJsonString =
+          prefs.getStringList('SlylistPlaylists');
+      slylistPlaylistsAsJsonString.forEach((slylistPlaylist) =>
+          slylistPlaylists.add(Slylist.fromJson(json.decode(slylistPlaylist))));
+    } catch (e) {
+      // If there are no slylists in memory, it throws exception.
+      // Its save to do nothing
+    }
     notifyListeners();
   }
 }

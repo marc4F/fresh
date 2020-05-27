@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 
 class ScreenProvider extends ChangeNotifier {}
