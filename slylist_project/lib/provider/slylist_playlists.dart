@@ -1,16 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/playlist.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //Playlists that where created from our app
 class SlylistPlaylistsProvider extends ChangeNotifier {
   final List<Playlist> slylistPlaylists = [];
 
   SlylistPlaylistsProvider() {
-    //Playlist pl1 = Playlist();
-    //pl1.name = "Slylist Playlist 1";
-    //_playlists.add(pl1);
-    //notifyListeners();
+    loadAllPlaylists();
   }
 
   createPlaylist(
@@ -24,7 +24,8 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
       bool isSynced) {
     slylistPlaylists.add(new Playlist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced));
-        notifyListeners();
+    saveAllPlaylists();
+    notifyListeners();
   }
 
   updatePlaylist(
@@ -39,6 +40,28 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
       bool isSynced) {
     existingPlaylist.updatePlaylist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced);
-        notifyListeners();
+    saveAllPlaylists();
+    notifyListeners();
+  }
+
+  saveAllPlaylists() async {
+    // obtain shared preferences
+    final prefs = await SharedPreferences.getInstance();
+
+    List<String> slylistPlaylistsAsJsonString = [];
+
+    slylistPlaylists.forEach((slylistPlaylist) => slylistPlaylistsAsJsonString
+        .add(json.encode(slylistPlaylist.toJson())));
+
+    prefs.setStringList('SlylistPlaylists', slylistPlaylistsAsJsonString);
+  }
+
+  loadAllPlaylists() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> slylistPlaylistsAsJsonString =
+        prefs.getStringList('SlylistPlaylists');
+    slylistPlaylistsAsJsonString.forEach((slylistPlaylist) =>
+        slylistPlaylists.add(Playlist.fromJson(json.decode(slylistPlaylist))));
+    notifyListeners();
   }
 }

@@ -1,5 +1,9 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'group.dart';
 
+part 'playlist.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Playlist {
   String name = "";
   List<String> sources;
@@ -47,4 +51,8 @@ class Playlist {
     this.isPublic = isPublic;
     this.isSynced = isSynced;
   }
+
+  factory Playlist.fromJson(Map<String, dynamic> json) => _$PlaylistFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PlaylistToJson(this);
 }
