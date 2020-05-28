@@ -56,7 +56,7 @@ class CreateGroupsRulesStep extends StatelessWidget {
                               screenProvider.removeRule(group, rule.id);
                               // Then show a snackbar.
                               Scaffold.of(context).showSnackBar(SnackBar(
-                                  content: Text("${rule.name} removed")));
+                                  content: Text('"${rule.name}" removed')));
                             },
                             background: Container(
                                 color: Colors.red,

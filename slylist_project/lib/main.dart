@@ -21,12 +21,12 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Using MultiProvider to provide every screen access to all playlist types
     return GestureDetector(
       onTap: () {
         // When clicking outside of keyboard, the keyboard will go away
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
       },
+      // Using MultiProvider to provide every screen access to all playlist types
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(
