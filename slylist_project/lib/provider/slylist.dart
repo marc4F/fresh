@@ -31,7 +31,7 @@ class SlylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updatePlaylist(
+  updateSlylist(
       Slylist existingPlaylist,
       String name,
       List<String> sources,
@@ -41,7 +41,7 @@ class SlylistProvider extends ChangeNotifier {
       String sort,
       bool isPublic,
       bool isSynced) {
-    existingPlaylist.updatePlaylist(name, sources, groups, groupsMatch,
+    existingPlaylist.updateSlylist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced);
     saveAllSlylists();
     notifyListeners();

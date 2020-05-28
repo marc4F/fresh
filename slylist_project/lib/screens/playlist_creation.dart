@@ -245,7 +245,7 @@ class ScreenProvider extends ChangeNotifier {
       if (playlist.name != playlistName) {
         setUniqueSlylistName();
       }
-      slylistProvider.updatePlaylist(
+      slylistProvider.updateSlylist(
           playlist,
           playlistName,
           selectedSources,

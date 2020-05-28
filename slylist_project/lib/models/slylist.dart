@@ -18,7 +18,7 @@ class Slylist extends Playlist {
       : super(name, sources, groups, groupsMatch, songLimit, sort, isPublic,
             isSynced);
 
-  updatePlaylist(
+  updateSlylist(
       String name,
       List<String> sources,
       List<Group> groups,
