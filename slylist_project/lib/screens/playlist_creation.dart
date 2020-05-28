@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/models/rule.dart';
+import 'package:slylist_project/models/slylist.dart';
+import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist_playlists.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';
@@ -24,8 +26,8 @@ class ScreenProvider extends ChangeNotifier {
     'Release Date - Ascending',
     'Release Date - Descending'
   ];
-  Playlist _existingPlaylist;
-  SlylistPlaylistsProvider _slylistPlaylistsProvider;
+  Playlist existingPlaylist;
+  SlylistPlaylistsProvider slylistPlaylistsProvider;
   List sources = [];
   List<Group> groups = [];
   int _activeStep = 0;
@@ -41,8 +43,8 @@ class ScreenProvider extends ChangeNotifier {
       SpotifyCreatedPlaylistsProvider spotifyCreatedPlaylistsProvider,
       SlylistPlaylistsProvider slylistPlaylistsProvider,
       Playlist playlist) {
-    _existingPlaylist = playlist;
-    _slylistPlaylistsProvider = slylistPlaylistsProvider;
+    existingPlaylist = playlist;
+    this.slylistPlaylistsProvider = slylistPlaylistsProvider;
     _combinePlaylistsToSources(
         spotifyCreatedPlaylistsProvider.spotifyCreatedPlaylists,
         slylistPlaylistsProvider.slylistPlaylists);
@@ -104,23 +106,27 @@ class ScreenProvider extends ChangeNotifier {
       {'name': 'Liked Albums', 'isSelected': false},
       {'name': 'Liked Songs', 'isSelected': false},
     ];
-    for (int i = 0; i < spotifyCreatedPlaylists.length; i++) {
-      sources
-          .add({'name': spotifyCreatedPlaylists[i].name, 'isSelected': false});
-    }
-    for (int i = 0; i < slylistPlaylists.length; i++) {
-      // Prevent that the slylist playlist becomes a source itself
-      if (_existingPlaylist?.name != slylistPlaylists[i].name) {
-        sources.add({'name': slylistPlaylists[i].name, 'isSelected': false});
+
+    spotifyCreatedPlaylists.forEach((spotifyCreatedPlaylist) => sources
+        .add({'name': spotifyCreatedPlaylist.name, 'isSelected': false}));
+
+    slylistPlaylists.forEach((slylistPlaylist) {
+      if (existingPlaylist != null && existingPlaylist is Slylist) {
+        // Prevent that existing slylist playlist becomes a source itself.
+        if (existingPlaylist.name != slylistPlaylist.name) {
+          sources.add({'name': slylistPlaylist.name, 'isSelected': false});
+        }
+      } else {
+        sources.add({'name': slylistPlaylist.name, 'isSelected': false});
       }
-    }
+    });
   }
 
   void _initStepsWithExistingPlaylist(Playlist playlist) {
     // Deep clone all groups(including rules and conditions)
     // Because user must be able to discard playlist creation, a fresh copy is needed.
-    playlist.groups.forEach(
-        (originalGroup) => groups.add(Group.fromJson(json.decode(json.encode(originalGroup.toJson())))));
+    playlist.groups.forEach((originalGroup) => groups
+        .add(Group.fromJson(json.decode(json.encode(originalGroup.toJson())))));
 
     _validSteps = {"step_0": true, "step_2": true};
     _match = playlist.groupsMatch;
@@ -218,38 +224,47 @@ class ScreenProvider extends ChangeNotifier {
 
     // Add 1s to the name, until it is unique
     void setUniquePlaylistName() {
-      for (var i = 0; i < sources.length; i++) {
-        if (sources[i]['name'] == playlistName) {
+      slylistPlaylistsProvider.slylistPlaylists.forEach((slylistPlaylist) {
+        if (slylistPlaylist.name == playlistName) {
           playlistName = playlistName + '1';
           setUniquePlaylistName();
         }
+      });
+    }
+
+    // Update a playlist if it already exists and is a slylist. Templates are (of course) not updated.
+    if (existingPlaylist != null && existingPlaylist is Slylist) {
+      // Only if user renamed playlist, check for unique name
+      // If user renamed playlist, then name must be unique, and changed if not.
+      if (existingPlaylist.name != playlistName) {
+        setUniquePlaylistName();
       }
-    }
-
-    setUniquePlaylistName();
-
-    if (_existingPlaylist != null) {
-      _slylistPlaylistsProvider.updatePlaylist(
-          _existingPlaylist,
+      slylistPlaylistsProvider.updatePlaylist(
+          existingPlaylist,
           playlistName,
           selectedSources,
           groups,
           _match,
+          // If user inputs some shit that can't be parsed to integer, then this function will set value to null
           int.tryParse(songLimit),
           _selectedSorting,
           _isPlaylistPublic,
           _isPlaylistSynced);
-    } else {
-      _slylistPlaylistsProvider.createPlaylist(
+      // Create a new playlist if it does not already exist, or the used playlist is from type template.
+    } else if (existingPlaylist == null || existingPlaylist is Template) {
+      setUniquePlaylistName();
+      slylistPlaylistsProvider.createPlaylist(
           playlistName,
           selectedSources,
           groups,
           _match,
+          // If user inputs some shit that can't be parsed to integer, then this function will set value to null
           int.tryParse(songLimit),
           _selectedSorting,
           _isPlaylistPublic,
           _isPlaylistSynced);
     }
+    // There may be a template navigation between. So that one must also be popped.
     Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 }

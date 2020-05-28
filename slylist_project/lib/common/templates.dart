@@ -26,7 +26,7 @@ const List<Map<String, dynamic>> templatePlaylistsJson = [
       }
     ],
     "groupsMatch": "MATCH ANY",
-    "songLimit": null,
+    "songLimit": 50,
     "sort": "Most Played",
     "isPublic": true,
     "isSynced": true

@@ -10,6 +10,9 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
   final List<Slylist> slylistPlaylists = [];
 
   SlylistPlaylistsProvider() {
+    // Only for debugging:
+    removeAllPlaylists();
+
     loadAllPlaylists();
   }
 
@@ -63,6 +66,17 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
           prefs.getStringList('SlylistPlaylists');
       slylistPlaylistsAsJsonString.forEach((slylistPlaylist) =>
           slylistPlaylists.add(Slylist.fromJson(json.decode(slylistPlaylist))));
+    } catch (e) {
+      // If there are no slylists in memory, it throws exception.
+      // Its save to do nothing
+    }
+    notifyListeners();
+  }
+
+  removeAllPlaylists() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove('SlylistPlaylists');
     } catch (e) {
       // If there are no slylists in memory, it throws exception.
       // Its save to do nothing
