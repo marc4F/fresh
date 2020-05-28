@@ -3,16 +3,16 @@ import 'package:slylist_project/common/templates.dart';
 import 'package:slylist_project/models/template.dart';
 
 //Playlists that we offer the user to use/customize
-class TemplatePlaylistsProvider extends ChangeNotifier {
-  final List<Template> templatePlaylists = [];
+class TemplateProvider extends ChangeNotifier {
+  final List<Template> templates = [];
 
-  TemplatePlaylistsProvider() {
+  TemplateProvider() {
     initTemplates();
     notifyListeners();
   }
   
   initTemplates() {
-    templatePlaylistsJson.forEach((templatePlaylist) =>
-        templatePlaylists.add(Template.fromJson(templatePlaylist)));
+    templatesJson.forEach((templatePlaylist) =>
+        templates.add(Template.fromJson(templatePlaylist)));
   }
 }

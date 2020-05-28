@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slylist_project/provider/slylist_playlists.dart';
+import 'package:slylist_project/provider/slylist.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
-class SlylistPlaylists extends StatelessWidget {
+class Slylists extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = 'My Playlists';
@@ -26,8 +26,8 @@ class SlylistPlaylists extends StatelessWidget {
           appBar: AppBar(
             title: Text(title),
           ),
-          body: Consumer<SlylistPlaylistsProvider>(
-            builder: (context, p, child) => (p.slylistPlaylists.length > 0)
+          body: Consumer<SlylistProvider>(
+            builder: (context, p, child) => (p.slylists.length > 0)
                 ? buildListView(p)
                 : buildPlaceholderText(context),
           ),
@@ -57,7 +57,7 @@ class SlylistPlaylists extends StatelessWidget {
               child: Text('PLAYLIST FROM TEMPLATE'),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/template_playlists');
+                Navigator.pushNamed(context, '/templates');
               },
             ),
             FlatButton(
@@ -125,15 +125,15 @@ class SlylistPlaylists extends StatelessWidget {
     );
   }
 
-  ListView buildListView(SlylistPlaylistsProvider p) {
+  ListView buildListView(SlylistProvider p) {
     return ListView.builder(
-      itemCount: p.slylistPlaylists.length,
+      itemCount: p.slylists.length,
       itemBuilder: (context, index) {
         return ListTile(
           trailing: PopupMenuButton<int>(
             onSelected: (menuValue) => (menuValue == 1)
                 ? Navigator.pushNamed(context, '/playlist_creation',
-                    arguments: p.slylistPlaylists[index])
+                    arguments: p.slylists[index])
                 : _onPressedOpenDeleteDialog(context),
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -146,7 +146,7 @@ class SlylistPlaylists extends StatelessWidget {
               )
             ],
           ),
-          title: Text('${p.slylistPlaylists[index].name}'),
+          title: Text('${p.slylists[index].name}'),
         );
       },
     );

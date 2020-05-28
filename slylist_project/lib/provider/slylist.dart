@@ -6,17 +6,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slylist_project/models/slylist.dart';
 
 //Playlists that where created from our app
-class SlylistPlaylistsProvider extends ChangeNotifier {
-  final List<Slylist> slylistPlaylists = [];
+class SlylistProvider extends ChangeNotifier {
+  final List<Slylist> slylists = [];
 
-  SlylistPlaylistsProvider() {
+  SlylistProvider() {
     // Only for debugging:
-    removeAllPlaylists();
+    removeAllSlylists();
 
-    loadAllPlaylists();
+    loadAllSlylists();
   }
 
-  createPlaylist(
+  createSlylist(
       String name,
       List<String> sources,
       List<Group> groups,
@@ -25,9 +25,9 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
       String sort,
       bool isPublic,
       bool isSynced) {
-    slylistPlaylists.add(new Slylist(name, sources, groups, groupsMatch,
+    slylists.add(new Slylist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced));
-    saveAllPlaylists();
+    saveAllSlylists();
     notifyListeners();
   }
 
@@ -43,29 +43,29 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
       bool isSynced) {
     existingPlaylist.updatePlaylist(name, sources, groups, groupsMatch,
         songLimit, sort, isPublic, isSynced);
-    saveAllPlaylists();
+    saveAllSlylists();
     notifyListeners();
   }
 
-  saveAllPlaylists() async {
+  saveAllSlylists() async {
     // obtain shared preferences
     final prefs = await SharedPreferences.getInstance();
 
-    List<String> slylistPlaylistsAsJsonString = [];
+    List<String> slylistsAsJsonString = [];
 
-    slylistPlaylists.forEach((slylistPlaylist) => slylistPlaylistsAsJsonString
-        .add(json.encode(slylistPlaylist.toJson())));
+    slylists.forEach((slylist) => slylistsAsJsonString
+        .add(json.encode(slylist.toJson())));
 
-    prefs.setStringList('SlylistPlaylists', slylistPlaylistsAsJsonString);
+    prefs.setStringList('Slylists', slylistsAsJsonString);
   }
 
-  loadAllPlaylists() async {
+  loadAllSlylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      List<String> slylistPlaylistsAsJsonString =
-          prefs.getStringList('SlylistPlaylists');
-      slylistPlaylistsAsJsonString.forEach((slylistPlaylist) =>
-          slylistPlaylists.add(Slylist.fromJson(json.decode(slylistPlaylist))));
+      List<String> slylistsAsJsonString =
+          prefs.getStringList('Slylists');
+      slylistsAsJsonString.forEach((slylist) =>
+          slylists.add(Slylist.fromJson(json.decode(slylist))));
     } catch (e) {
       // If there are no slylists in memory, it throws exception.
       // Its save to do nothing
@@ -73,10 +73,10 @@ class SlylistPlaylistsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  removeAllPlaylists() async {
+  removeAllSlylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      prefs.remove('SlylistPlaylists');
+      prefs.remove('Slylists');
     } catch (e) {
       // If there are no slylists in memory, it throws exception.
       // Its save to do nothing

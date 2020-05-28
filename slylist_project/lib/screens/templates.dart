@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/models/template.dart';
-import 'package:slylist_project/provider/slylist_playlists.dart';
-import 'package:slylist_project/provider/template_playlists.dart';
+import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/provider/template.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
-class TemplatePlaylists extends StatelessWidget {
+class Templates extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = 'Template Playlists';
@@ -19,43 +19,43 @@ class TemplatePlaylists extends StatelessWidget {
           appBar: AppBar(
             title: Text(title),
           ),
-          body: Consumer2<TemplatePlaylistsProvider, SlylistPlaylistsProvider>(
-              builder: (context, templatePlaylistsProvider,
-                      slylistPlaylistsProvider, child) =>
+          body: Consumer2<TemplateProvider, SlylistProvider>(
+              builder: (context, templateProvider,
+                      slylistProvider, child) =>
                   buildListView(
-                      templatePlaylistsProvider, slylistPlaylistsProvider)),
+                      templateProvider, slylistProvider)),
         ),
       ),
     );
   }
 
-  ListView buildListView(TemplatePlaylistsProvider templatePlaylistsProvider,
-      SlylistPlaylistsProvider slylistPlaylistsProvider) {
+  ListView buildListView(TemplateProvider templateProvider,
+      SlylistProvider slylistProvider) {
     return ListView.builder(
-      itemCount: templatePlaylistsProvider.templatePlaylists.length,
+      itemCount: templateProvider.templates.length,
       itemBuilder: (context, index) {
         Template templatePlaylist =
-            templatePlaylistsProvider.templatePlaylists[index];
+            templateProvider.templates[index];
         // Add 1s to the name, until it is unique
 
         void createSlylistAndGoToHomeScreen(context) {
           String playlistName = templatePlaylist.name;
 
-          void setUniquePlaylistName() {
-            List<Slylist> slylistPlaylists =
-                slylistPlaylistsProvider.slylistPlaylists;
+          void setUniqueSlylistName() {
+            List<Slylist> slylists =
+                slylistProvider.slylists;
 
-            slylistPlaylists.forEach((slylistPlaylist) {
-              if (slylistPlaylist.name == playlistName) {
+            slylists.forEach((slylist) {
+              if (slylist.name == playlistName) {
                 playlistName = playlistName + '1';
-                setUniquePlaylistName();
+                setUniqueSlylistName();
               }
             });
           }
 
-          setUniquePlaylistName();
+          setUniqueSlylistName();
 
-          slylistPlaylistsProvider.createPlaylist(
+          slylistProvider.createSlylist(
               playlistName,
               templatePlaylist.sources,
               templatePlaylist.groups,

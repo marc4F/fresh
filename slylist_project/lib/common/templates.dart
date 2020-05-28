@@ -1,4 +1,4 @@
-const List<Map<String, dynamic>> templatePlaylistsJson = [
+const List<Map<String, dynamic>> templatesJson = [
   {
     "name": "Long Songs I played once",
     "description": "This is a awesome template for some awesome people",

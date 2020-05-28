@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/common/theme.dart';
 
-import 'package:slylist_project/screens/slylist_playlists.dart';
-import 'package:slylist_project/screens/template_playlists.dart';
+import 'package:slylist_project/screens/slylists.dart';
+import 'package:slylist_project/screens/templates.dart';
 import 'package:slylist_project/screens/playlist_creation.dart';
 
-import 'package:slylist_project/provider/slylist_playlists.dart';
-import 'package:slylist_project/provider/template_playlists.dart';
-import 'package:slylist_project/provider/spotify_created_playlists.dart';
+import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/provider/template.dart';
+import 'package:slylist_project/provider/spotify_playlist.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,19 +30,19 @@ class MyApp extends StatelessWidget {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(
-              create: (context) => SlylistPlaylistsProvider()),
+              create: (context) => SlylistProvider()),
           ChangeNotifierProvider(
-              create: (context) => TemplatePlaylistsProvider()),
+              create: (context) => TemplateProvider()),
           ChangeNotifierProvider(
-              create: (context) => SpotifyCreatedPlaylistsProvider())
+              create: (context) => SpotifyPlaylistProvider())
         ],
         child: MaterialApp(
           title: 'Slylist',
           theme: appTheme,
           initialRoute: '/',
           routes: {
-            '/': (context) => SlylistPlaylists(),
-            '/template_playlists': (context) => TemplatePlaylists(),
+            '/': (context) => Slylists(),
+            '/templates': (context) => Templates(),
             '/playlist_creation': (context) => PlaylistCreation()
           },
         ),
