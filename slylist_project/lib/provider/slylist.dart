@@ -2,12 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:slylist_project/models/group.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slylist_project/models/slylist.dart';
+import 'package:slylist_project/services/data-cache.dart';
 
 //Playlists that where created from our app
 class SlylistProvider extends ChangeNotifier {
   final List<Slylist> slylists = [];
+  final _dataCache = new DataCache();
 
   SlylistProvider() {
     // Only for debugging:
@@ -25,8 +26,8 @@ class SlylistProvider extends ChangeNotifier {
       String sort,
       bool isPublic,
       bool isSynced) {
-    slylists.add(new Slylist(name, sources, groups, groupsMatch,
-        songLimit, sort, isPublic, isSynced));
+    slylists.add(new Slylist(name, sources, groups, groupsMatch, songLimit,
+        sort, isPublic, isSynced));
     saveAllSlylists();
     notifyListeners();
   }
@@ -48,39 +49,24 @@ class SlylistProvider extends ChangeNotifier {
   }
 
   saveAllSlylists() async {
-    // obtain shared preferences
-    final prefs = await SharedPreferences.getInstance();
-
     List<String> slylistsAsJsonString = [];
 
-    slylists.forEach((slylist) => slylistsAsJsonString
-        .add(json.encode(slylist.toJson())));
+    slylists.forEach(
+        (slylist) => slylistsAsJsonString.add(json.encode(slylist.toJson())));
 
-    prefs.setStringList('Slylists', slylistsAsJsonString);
+    _dataCache.writeStringList('Slylists', slylistsAsJsonString);
   }
 
   loadAllSlylists() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      List<String> slylistsAsJsonString =
-          prefs.getStringList('Slylists');
-      slylistsAsJsonString.forEach((slylist) =>
-          slylists.add(Slylist.fromJson(json.decode(slylist))));
-    } catch (e) {
-      // If there are no slylists in memory, it throws exception.
-      // Its save to do nothing
-    }
+    List<String> slylistsAsJsonString =
+        await _dataCache.readStringList('Slylists');
+    slylistsAsJsonString.forEach(
+        (slylist) => slylists.add(Slylist.fromJson(json.decode(slylist))));
     notifyListeners();
   }
 
   removeAllSlylists() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      prefs.remove('Slylists');
-    } catch (e) {
-      // If there are no slylists in memory, it throws exception.
-      // Its save to do nothing
-    }
+    _dataCache.delete('Slylists');
     notifyListeners();
   }
 }
