@@ -12,7 +12,10 @@ environment:
 dependencies:
   dio: ^3.0.9
   meta: ^1.1.8
-  fresh: ^0.2.1
+  fresh:
+    git:
+      url: git://github.com/marc4F/fresh.git
+      path: packages/fresh
 
 dev_dependencies:
   effective_dart: ^1.2.1
