@@ -138,7 +138,7 @@ class Fresh<T extends Token> extends Interceptor {
   static Map<String, String> _defaultTokenHeader(Token token) {
     if (token is OAuth2Token) {
       return {
-        'authorization': '${token.tokenType} ${token.accessToken}',
+        'Authorization': '${token.tokenType} ${token.accessToken}',
       };
     }
     throw UnimplementedError();
