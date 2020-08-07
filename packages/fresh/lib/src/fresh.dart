@@ -12,7 +12,7 @@ class OAuth2Token implements Token {
   /// {macro oauth2_token}
   const OAuth2Token({
     @required this.accessToken,
-    this.tokenType = 'bearer',
+    this.tokenType = 'Bearer',
     this.expiresIn,
     this.refreshToken,
     this.scope,
