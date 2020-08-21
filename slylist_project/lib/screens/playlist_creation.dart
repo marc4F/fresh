@@ -43,15 +43,12 @@ class ScreenProvider extends ChangeNotifier {
   String playlistName = '';
   String songLimit = '';
 
-  ScreenProvider(
-      SpotifyPlaylistProvider spotifyPlaylistsProvider,
-      SlylistProvider slylistProvider,
-      Playlist playlist) {
+  ScreenProvider(SpotifyPlaylistProvider spotifyPlaylistsProvider,
+      SlylistProvider slylistProvider, Playlist playlist) {
     this.playlist = playlist;
     this.slylistProvider = slylistProvider;
     _combinePlaylistsToSources(
-        spotifyPlaylistsProvider.spotifyPlaylists,
-        slylistProvider.slylists);
+        spotifyPlaylistsProvider.spotifyPlaylists, slylistProvider.slylists);
     if (this.playlist == null) {
       // For each NEW playlist, a empty group will be added, to make it easier to start for user
       addGroup();
@@ -102,8 +99,7 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _combinePlaylistsToSources(
-      List spotifyPlaylists, List slylists) {
+  _combinePlaylistsToSources(List spotifyPlaylists, List slylists) {
     sources = [
       {'name': 'Complete Library', 'isSelected': false, 'isDefault': true},
       {'name': 'Liked Artists', 'isSelected': false, 'isDefault': true},
@@ -111,17 +107,22 @@ class ScreenProvider extends ChangeNotifier {
       {'name': 'Liked Songs', 'isSelected': false, 'isDefault': true},
     ];
 
-    spotifyPlaylists.forEach((spotifyCreatedPlaylist) => sources
-        .add({'name': spotifyCreatedPlaylist.name, 'isSelected': false, 'isDefault': false}));
+    spotifyPlaylists.forEach((spotifyCreatedPlaylist) => sources.add({
+          'name': spotifyCreatedPlaylist.name,
+          'isSelected': false,
+          'isDefault': false
+        }));
 
     slylists.forEach((slylist) {
       if (playlist != null && playlist is Slylist) {
         // Prevent that existing slylist playlist becomes a source itself.
         if (playlist.name != slylist.name) {
-          sources.add({'name': slylist.name, 'isSelected': false, 'isDefault': false});
+          sources.add(
+              {'name': slylist.name, 'isSelected': false, 'isDefault': false});
         }
       } else {
-        sources.add({'name': slylist.name, 'isSelected': false, 'isDefault': false});
+        sources.add(
+            {'name': slylist.name, 'isSelected': false, 'isDefault': false});
       }
     });
   }
@@ -237,7 +238,7 @@ class ScreenProvider extends ChangeNotifier {
       });
     }
 
-    // Update a playlist if it already exists and is a slylist. 
+    // Update a playlist if it already exists and is a slylist.
     // Templates are (of course) not updated, and only used for creation of new playlists.
     if (playlist != null && playlist is Slylist) {
       // Only if user renamed playlist, check for unique name
@@ -271,7 +272,7 @@ class ScreenProvider extends ChangeNotifier {
           _isPlaylistSynced);
     }
     // There may be a template navigation between. So that one must also be popped.
-    Navigator.popUntil(context, ModalRoute.withName('/'));
+    Navigator.popUntil(context, ModalRoute.withName('/slylists'));
   }
 }
 

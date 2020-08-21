@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/services/spotify_client.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
 class Slylists extends StatelessWidget {
+  final SpotifyClient spotifyClient;
+
+  Slylists(this.spotifyClient);
+
   @override
   Widget build(BuildContext context) {
     final title = 'My Playlists';
@@ -21,6 +26,7 @@ class Slylists extends StatelessWidget {
                   tooltip: 'Select Playlist Type',
                   child: Icon(Icons.playlist_add),
                   onPressed: () async => _onPressedOpenPlaylistDialog(context)),
+              //onPressed: () async => this.spotifyClient.test()),
             ),
           ),
           appBar: AppBar(
@@ -47,8 +53,7 @@ class Slylists extends StatelessWidget {
             child: ListBody(
               children: <Widget>[
                 Text('Use one of our awesome templates.'),
-                Text(
-                    'Or be creative, and use custom rules.'),
+                Text('Or be creative, and use custom rules.'),
               ],
             ),
           ),
@@ -80,8 +85,7 @@ class Slylists extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Can't delete playlist"),
-          content: Text(
-              "Please use spotify, to delete playlists."),
+          content: Text("Please use spotify, to delete playlists."),
           actions: <Widget>[
             FlatButton(
               child: Text('OK'),

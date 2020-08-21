@@ -6,6 +6,8 @@ part 'slylist.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class Slylist extends Playlist {
+  String spotifyId;
+
   Slylist(
       String name,
       List<String> sources,

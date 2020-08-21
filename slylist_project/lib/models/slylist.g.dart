@@ -19,7 +19,7 @@ Slylist _$SlylistFromJson(Map<String, dynamic> json) {
     json['sort'] as String,
     json['isPublic'] as bool,
     json['isSynced'] as bool,
-  );
+  )..spotifyId = json['spotifyId'] as String;
 }
 
 Map<String, dynamic> _$SlylistToJson(Slylist instance) => <String, dynamic>{
@@ -31,4 +31,5 @@ Map<String, dynamic> _$SlylistToJson(Slylist instance) => <String, dynamic>{
       'sort': instance.sort,
       'isPublic': instance.isPublic,
       'isSynced': instance.isSynced,
+      'spotifyId': instance.spotifyId,
     };

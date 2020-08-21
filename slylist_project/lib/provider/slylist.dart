@@ -12,7 +12,7 @@ class SlylistProvider extends ChangeNotifier {
 
   SlylistProvider() {
     // Only for debugging:
-    removeAllSlylists();
+    //removeAllSlylists();
 
     loadAllSlylists();
   }
@@ -60,8 +60,10 @@ class SlylistProvider extends ChangeNotifier {
   loadAllSlylists() async {
     List<String> slylistsAsJsonString =
         await _dataCache.readStringList('Slylists');
-    slylistsAsJsonString.forEach(
-        (slylist) => slylists.add(Slylist.fromJson(json.decode(slylist))));
+    if (slylistsAsJsonString != null) {
+      slylistsAsJsonString.forEach(
+          (slylist) => slylists.add(Slylist.fromJson(json.decode(slylist))));
+    }
     notifyListeners();
   }
 
