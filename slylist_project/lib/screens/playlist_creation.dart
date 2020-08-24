@@ -6,6 +6,7 @@ import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/screens/slylists.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
@@ -271,8 +272,11 @@ class ScreenProvider extends ChangeNotifier {
           _isPlaylistPublic,
           _isPlaylistSynced);
     }
-    // There may be a template navigation between. So that one must also be popped.
-    Navigator.popUntil(context, ModalRoute.withName('/slylists'));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Slylists()),
+      (Route<dynamic> route) => false,
+    );
   }
 }
 

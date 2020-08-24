@@ -5,6 +5,7 @@ import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/screens/playlist_creation.dart';
 import 'package:slylist_project/widgets/conditions/compare.dart';
+import 'package:slylist_project/widgets/conditions/days.dart';
 import 'package:slylist_project/widgets/conditions/int_value.dart';
 import 'package:slylist_project/common/custom_colors.dart';
 
@@ -48,7 +49,9 @@ class CreateGroupsRulesStep extends StatelessWidget {
                         itemCount: group.rules.length,
                         itemBuilder: (context, ruleIndex) {
                           final Rule rule = group.rules[ruleIndex];
-                          final String ruleInfo = ruleCatalogue.firstWhere((catRule) => catRule['name'] == rule.name)['info'];
+                          final String ruleInfo = ruleCatalogue.firstWhere(
+                              (catRule) =>
+                                  catRule['name'] == rule.name)['info'];
                           return Dismissible(
                             key: Key(rule.id),
                             direction: DismissDirection.endToStart,
@@ -75,8 +78,7 @@ class CreateGroupsRulesStep extends StatelessWidget {
                                   visible: ruleInfo != '',
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                        "Info: $ruleInfo",
+                                    child: Text("Info: $ruleInfo",
                                         textScaleFactor: 0.7),
                                   ),
                                 )
@@ -194,6 +196,10 @@ Widget createWidgetforCondition(rule, condition) {
     case 'intValue':
       {
         return IntValue(rule: rule);
+      }
+    case 'days':
+      {
+        return Days(rule: rule);
       }
       break;
   }

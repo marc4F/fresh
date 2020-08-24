@@ -20,14 +20,13 @@ import 'package:slylist_project/services/data-cache.dart';
 import 'package:slylist_project/services/spotify_client.dart';
 import 'package:workmanager/workmanager.dart';
 
-String _accessToken, _refreshToken;
+String _accessToken;
 final _spotifyClient = SpotifyClient();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final _dataCache = new DataCache();
   _accessToken = await _dataCache.readString('accessToken');
-  _refreshToken = await _dataCache.readString('refreshToken');
 
   runApp(MyApp());
 
@@ -64,7 +63,7 @@ class MyApp extends StatelessWidget {
           initialRoute: (_accessToken == null) ? '/spotify_login' : '/slylists',
           routes: {
             '/spotify_login': (context) => SpotifyLogin(_spotifyClient),
-            '/slylists': (context) => Slylists(_spotifyClient),
+            '/slylists': (context) => Slylists(),
             '/templates': (context) => Templates(),
             '/playlist_creation': (context) => PlaylistCreation()
           },

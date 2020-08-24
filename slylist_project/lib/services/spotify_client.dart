@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:slylist_project/common/const.dart';
+import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/services/data-cache.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:quiver/iterables.dart';
 
 class SpotifyClient {
   SpotifyClient({Dio httpClient})
@@ -76,8 +78,73 @@ class SpotifyClient {
     await _fresh.setToken(null);
   }
 
-  test() async {
-    final response = await _httpClient.get('/me');
-    debugPrint('response = ${response.data}');
+  Future<String> getSpotifyUserId() async {
+    try {
+      final response = await _httpClient.get('/me');
+      return response.data["id"];
+    } catch (e) {
+      debugPrint(e.error);
+      return null;
+    }
+  }
+
+  Future<String> createSpotifyPlaylistAndGetId(
+      Slylist slylist, String spotifyUserId) async {
+    try {
+      String url = '/users/$spotifyUserId/playlists';
+      final response = await _httpClient
+          .post(url, data: {'name': slylist.name, 'public': slylist.isPublic});
+      return response.data["id"];
+    } catch (e) {
+      debugPrint(e.error);
+      return null;
+    }
+  }
+
+  Future<void> clearSpotifyPlaylist(String spotifyPlaylistId) async {
+    try {
+      String url = '/playlists/$spotifyPlaylistId/tracks';
+      final data = {'uris': []};
+      await _httpClient.put(url, data: data);
+    } catch (e) {
+      debugPrint(e.error);
+    }
+  }
+
+  Future<void> addTracksToSpotifyPlaylist(
+      String spotifyPlaylistId, List<String> tracks) async {
+    try {
+      final tracksPartitioned = partition(tracks, 50);
+      await Future.forEach(tracksPartitioned,
+          (List<String> tracksPartition) async {
+        String url = '/playlists/$spotifyPlaylistId/tracks';
+        final data = {'uris': tracksPartition};
+        await _httpClient.post(url, data: data);
+      });
+    } catch (e) {
+      debugPrint(e.error);
+    }
+  }
+
+  Future<dynamic> getUserSavedTracks() async {
+    bool next = true;
+    String url = '/me/tracks';
+    var items = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        url = response.data["next"];
+        items.add(response.data["items"]);
+        if (url == null || url == "") {
+          debugPrint("done");
+          next = false;
+        }
+      } catch (e) {
+        debugPrint(e.error);
+        return null;
+      }
+    }
+    //Flatten items array which contains n arrays
+    return items.expand((i) => i).toList();
   }
 }

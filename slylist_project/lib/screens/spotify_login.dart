@@ -97,15 +97,20 @@ class SpotifyLogin extends StatelessWidget {
             var accessToken = body['access_token'];
             var refreshToken = body['refresh_token'];
 
+            if (accessToken == null || refreshToken == null) {
+              exit(0);
+            }
             final dataCache = new DataCache();
             dataCache.writeString('accessToken', accessToken);
             dataCache.writeString('refreshToken', refreshToken);
 
             spotifyClient.setInitialTokens(accessToken, refreshToken);
+            String spotifyUserId = await spotifyClient.getSpotifyUserId();
+            dataCache.writeString('spotifyUserId', spotifyUserId);
 
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => Slylists(spotifyClient)),
+              MaterialPageRoute(builder: (context) => Slylists()),
               (Route<dynamic> route) => false,
             );
 

@@ -7,20 +7,19 @@ import 'package:slylist_project/screens/playlist_creation.dart';
 
 class Compare extends StatelessWidget {
   final Rule rule;
+  final id = "compare";
 
   Compare({this.rule});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ScreenProvider>(
-        builder: (context, screenProvider, child) {
-      var condition = rule.conditions.firstWhere(
-          (condition) => condition['type'] == 'compare');
+    return Consumer<ScreenProvider>(builder: (context, screenProvider, child) {
+      var condition =
+          rule.conditions.firstWhere((condition) => condition['type'] == id);
       if (condition['value'] == null) condition['value'] = "is";
       return FlatButton(
         color: Theme.of(context).colorScheme.ruleButton,
-        child: Text('${condition['value']}',
-            overflow: TextOverflow.ellipsis),
+        child: Text('${condition['value']}', overflow: TextOverflow.ellipsis),
         onPressed: () {
           showModalBottomSheet<void>(
             context: context,
@@ -30,23 +29,18 @@ class Compare extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 height: MediaQuery.of(context).size.height / 3,
                 child: ListView.separated(
-                  itemCount: conditionOptions['compare']
-                          ['options']
-                      .length,
+                  itemCount: conditionOptions[id]['options'].length,
                   itemBuilder: (context, index) {
-                    String conditionOption = conditionOptions['compare']
-                        ['options'][index];
+                    String conditionOption =
+                        conditionOptions[id]['options'][index];
                     return ListTile(
                       onTap: () {
                         screenProvider.changeConditionValue(
-                            rule,
-                            'compare',
-                            conditionOption);
+                            rule, id, conditionOption);
                         Navigator.pop(context);
                       },
                       selected: conditionOption == condition['value'],
-                      title: Text(
-                          '${conditionOptions['compare']['options'][index]}'),
+                      title: Text('${conditionOptions[id]['options'][index]}'),
                     );
                   },
                   separatorBuilder: (context, index) {
