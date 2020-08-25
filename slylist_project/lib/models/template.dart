@@ -1,11 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:slylist_project/models/playlist.dart';
+import 'package:slylist_project/models/applist.dart';
 import 'group.dart';
 
 part 'template.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class Template extends Playlist {
+class Template extends Applist {
   String description;
 
   Template(

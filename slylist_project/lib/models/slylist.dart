@@ -1,11 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:slylist_project/models/playlist.dart';
+import 'package:slylist_project/models/applist.dart';
 import 'group.dart';
 
 part 'slylist.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class Slylist extends Playlist {
+class Slylist extends Applist {
   String spotifyId;
 
   Slylist(

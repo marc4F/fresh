@@ -57,9 +57,9 @@ class SpotifyOAuth {
 
 class SpotifyLogin extends StatelessWidget {
   final _spotifyOAuth = SpotifyOAuth();
-  final SpotifyClient spotifyClient;
+  final SpotifyClient _spotifyClient;
 
-  SpotifyLogin(this.spotifyClient);
+  SpotifyLogin(this._spotifyClient);
 
   @override
   Widget build(BuildContext context) {
@@ -104,13 +104,13 @@ class SpotifyLogin extends StatelessWidget {
             dataCache.writeString('accessToken', accessToken);
             dataCache.writeString('refreshToken', refreshToken);
 
-            spotifyClient.setInitialTokens(accessToken, refreshToken);
-            String spotifyUserId = await spotifyClient.getSpotifyUserId();
+            _spotifyClient.setInitialTokens(accessToken, refreshToken);
+            String spotifyUserId = await _spotifyClient.getSpotifyUserId();
             dataCache.writeString('spotifyUserId', spotifyUserId);
 
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => Slylists()),
+              MaterialPageRoute(builder: (context) => Slylists(_spotifyClient)),
               (Route<dynamic> route) => false,
             );
 

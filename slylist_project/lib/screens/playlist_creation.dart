@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slylist_project/models/applist.dart';
 import 'package:slylist_project/models/group.dart';
-import 'package:slylist_project/models/playlist.dart';
 import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/models/slylist.dart';
+import 'package:slylist_project/models/spotify_playlist.dart';
 import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist.dart';
 import 'package:slylist_project/screens/slylists.dart';
+import 'package:slylist_project/services/spotify_client.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
@@ -30,7 +32,7 @@ class ScreenProvider extends ChangeNotifier {
 
   // May be from type "slylist" or "template" or value is null(new playlist).
   // All dependend from which place the user enters this screen.
-  Playlist playlist;
+  Applist playlist;
 
   SlylistProvider slylistProvider;
   List sources = [];
@@ -43,13 +45,17 @@ class ScreenProvider extends ChangeNotifier {
   bool _isPlaylistSynced = true;
   String playlistName = '';
   String songLimit = '';
+  SpotifyClient _spotifyClient;
 
-  ScreenProvider(SpotifyPlaylistProvider spotifyPlaylistsProvider,
-      SlylistProvider slylistProvider, Playlist playlist) {
+  ScreenProvider(
+      SpotifyPlaylistProvider spotifyPlaylistsProvider,
+      SlylistProvider slylistProvider,
+      Applist playlist,
+      SpotifyClient spotifyClient) {
+    this._spotifyClient = spotifyClient;
     this.playlist = playlist;
     this.slylistProvider = slylistProvider;
-    _combinePlaylistsToSources(
-        spotifyPlaylistsProvider.spotifyPlaylists, slylistProvider.slylists);
+    _combinePlaylistsToSources(spotifyPlaylistsProvider.spotifyPlaylists);
     if (this.playlist == null) {
       // For each NEW playlist, a empty group will be added, to make it easier to start for user
       addGroup();
@@ -100,7 +106,7 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _combinePlaylistsToSources(List spotifyPlaylists, List slylists) {
+  _combinePlaylistsToSources(List<SpotifyPlaylist> spotifyPlaylists) {
     sources = [
       {'name': 'Complete Library', 'isSelected': false, 'isDefault': true},
       {'name': 'Liked Artists', 'isSelected': false, 'isDefault': true},
@@ -108,22 +114,16 @@ class ScreenProvider extends ChangeNotifier {
       {'name': 'Liked Songs', 'isSelected': false, 'isDefault': true},
     ];
 
-    spotifyPlaylists.forEach((spotifyCreatedPlaylist) => sources.add({
-          'name': spotifyCreatedPlaylist.name,
-          'isSelected': false,
-          'isDefault': false
-        }));
-
-    slylists.forEach((slylist) {
+    spotifyPlaylists.forEach((SpotifyPlaylist spotifyPlaylist) {
       if (playlist != null && playlist is Slylist) {
-        // Prevent that existing slylist playlist becomes a source itself.
-        if (playlist.name != slylist.name) {
-          sources.add(
-              {'name': slylist.name, 'isSelected': false, 'isDefault': false});
+        Slylist slylist = (playlist as Slylist);
+        if (spotifyPlaylist.id != slylist.spotifyId) {
+          sources.add({
+            'name': spotifyPlaylist.name,
+            'isSelected': false,
+            'isDefault': false
+          });
         }
-      } else {
-        sources.add(
-            {'name': slylist.name, 'isSelected': false, 'isDefault': false});
       }
     });
   }
@@ -274,13 +274,17 @@ class ScreenProvider extends ChangeNotifier {
     }
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => Slylists()),
+      MaterialPageRoute(builder: (context) => Slylists(_spotifyClient)),
       (Route<dynamic> route) => false,
     );
   }
 }
 
 class PlaylistCreation extends StatelessWidget {
+  final SpotifyClient _spotifyClient;
+
+  PlaylistCreation(this._spotifyClient);
+
   setStepIfAllowed(int index, ScreenProvider screenProvider) {
     if (screenProvider.activeStep == 0 && screenProvider.validSteps['step_0']) {
       screenProvider.activeStep = index;
@@ -293,12 +297,13 @@ class PlaylistCreation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Playlist playlist = ModalRoute.of(context).settings.arguments;
+    final Applist playlist = ModalRoute.of(context).settings.arguments;
     return ChangeNotifierProvider(
       create: (context) => ScreenProvider(
           Provider.of<SpotifyPlaylistProvider>(context, listen: false),
           Provider.of<SlylistProvider>(context, listen: false),
-          playlist),
+          playlist,
+          _spotifyClient),
       child: Scaffold(
           appBar: AppBar(
             title: Text("Create Playlist"),

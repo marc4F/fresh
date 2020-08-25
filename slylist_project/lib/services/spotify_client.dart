@@ -88,6 +88,27 @@ class SpotifyClient {
     }
   }
 
+  Future<List<dynamic>> getSpotifyPlaylists(String spotifyUserId) async {
+    bool next = true;
+    String url = '/users/$spotifyUserId/playlists';
+    var items = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        url = response.data["next"];
+        items.add(response.data["items"]);
+        if (url == null || url == "") {
+          next = false;
+        }
+      } catch (e) {
+        debugPrint(e.error);
+        return null;
+      }
+    }
+    //Flatten items array which contains n arrays
+    return items.expand((i) => i).toList();
+  }
+
   Future<String> createSpotifyPlaylistAndGetId(
       Slylist slylist, String spotifyUserId) async {
     try {
@@ -111,6 +132,15 @@ class SpotifyClient {
     }
   }
 
+  Future<void> removeSpotifyPlaylist(String spotifyPlaylistId) async {
+    try {
+      String url = '/playlists/$spotifyPlaylistId/followers';
+      await _httpClient.delete(url);
+    } catch (e) {
+      debugPrint(e.error);
+    }
+  }
+
   Future<void> addTracksToSpotifyPlaylist(
       String spotifyPlaylistId, List<String> tracks) async {
     try {
@@ -126,7 +156,7 @@ class SpotifyClient {
     }
   }
 
-  Future<dynamic> getUserSavedTracks() async {
+  Future<List<dynamic>> getUserSavedTracks() async {
     bool next = true;
     String url = '/me/tracks';
     var items = [];
@@ -136,7 +166,6 @@ class SpotifyClient {
         url = response.data["next"];
         items.add(response.data["items"]);
         if (url == null || url == "") {
-          debugPrint("done");
           next = false;
         }
       } catch (e) {

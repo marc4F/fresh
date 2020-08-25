@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/services/spotify_client.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
 class Slylists extends StatelessWidget {
+  final SpotifyClient _spotifyClient;
+
+  Slylists(this._spotifyClient);
+
   @override
   Widget build(BuildContext context) {
     final title = 'My Playlists';
