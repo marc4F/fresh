@@ -88,9 +88,9 @@ class SpotifyClient {
     }
   }
 
-  Future<List<dynamic>> getSpotifyPlaylists(String spotifyUserId) async {
+  Future<List<dynamic>> getSpotifyPlaylists() async {
     bool next = true;
-    String url = '/users/$spotifyUserId/playlists';
+    String url = '/me/playlists';
     var items = [];
     while (next) {
       try {
@@ -175,5 +175,18 @@ class SpotifyClient {
     }
     //Flatten items array which contains n arrays
     return items.expand((i) => i).toList();
+  }
+
+  Future<bool> isPlaylistAvailable(String spotifyPlaylistId) async {
+    if (spotifyPlaylistId == null) {
+      return false;
+    }
+    List spotifyPlaylists = await this.getSpotifyPlaylists();
+    for (var spotifyPlaylist in spotifyPlaylists) {
+      if (spotifyPlaylist["id"] == spotifyPlaylistId) {
+        return true;
+      }
+    }
+    return false;
   }
 }

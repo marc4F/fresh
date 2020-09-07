@@ -4,6 +4,7 @@ import 'package:slylist_project/models/applist.dart';
 import 'package:slylist_project/models/group.dart';
 import 'package:slylist_project/models/rule.dart';
 import 'package:slylist_project/models/slylist.dart';
+import 'package:slylist_project/models/source.dart';
 import 'package:slylist_project/models/spotify_playlist.dart';
 import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist.dart';
@@ -35,7 +36,7 @@ class ScreenProvider extends ChangeNotifier {
   Applist playlist;
 
   SlylistProvider slylistProvider;
-  List sources = [];
+  List<Source> sources = [];
   List<Group> groups = [];
   int _activeStep = 0;
   Map _validSteps = {"step_0": false, "step_2": false};
@@ -108,22 +109,22 @@ class ScreenProvider extends ChangeNotifier {
 
   _combinePlaylistsToSources(List<SpotifyPlaylist> spotifyPlaylists) {
     sources = [
-      {'name': 'Complete Library', 'isSelected': false, 'isDefault': true},
-      {'name': 'Liked Artists', 'isSelected': false, 'isDefault': true},
-      {'name': 'Liked Albums', 'isSelected': false, 'isDefault': true},
-      {'name': 'Liked Songs', 'isSelected': false, 'isDefault': true},
+      Source('0', 'Complete Library', false, true),
+      Source('1', 'Liked Artists', false, true),
+      Source('2', 'Liked Albums', false, true),
+      Source('3', 'Liked Songs', false, true)
     ];
 
     spotifyPlaylists.forEach((SpotifyPlaylist spotifyPlaylist) {
       if (playlist != null && playlist is Slylist) {
         Slylist slylist = (playlist as Slylist);
         if (spotifyPlaylist.id != slylist.spotifyId) {
-          sources.add({
-            'name': spotifyPlaylist.name,
-            'isSelected': false,
-            'isDefault': false
-          });
+          sources.add(
+              Source(spotifyPlaylist.id, spotifyPlaylist.name, false, false));
         }
+      } else {
+        sources.add(
+            Source(spotifyPlaylist.id, spotifyPlaylist.name, false, false));
       }
     });
   }
@@ -144,19 +145,19 @@ class ScreenProvider extends ChangeNotifier {
 
     if (playlist.sources[0] == "Complete Library") {
       // Select all sources. Even those playlists that where created after this playlist.
-      sources = sources.map((list) {
-        list['isSelected'] = true;
-        return list;
+      sources = sources.map((source) {
+        source.isSelected = true;
+        return source;
       }).toList();
     } else {
       // Select all sources that where selected before.
-      sources = sources.map((list) {
-        playlist.sources.forEach((source) {
-          if (source == list['name']) {
-            list['isSelected'] = true;
+      sources = sources.map((source) {
+        playlist.sources.forEach((sourceId) {
+          if (source.id == sourceId) {
+            source.isSelected = true;
           }
         });
-        return list;
+        return source;
       }).toList();
     }
     (playlist.songLimit != null)
@@ -166,13 +167,13 @@ class ScreenProvider extends ChangeNotifier {
 
   void changeSelectAllSources(bool isSelected) {
     for (int i = 0; i < sources.length; i++) {
-      sources[i]['isSelected'] = isSelected;
+      sources[i].isSelected = isSelected;
     }
   }
 
   bool hasSelectedSource() {
     for (int i = 0; i < sources.length; i++) {
-      if (sources[i]['isSelected']) {
+      if (sources[i].isSelected) {
         return true;
       }
     }
@@ -181,7 +182,7 @@ class ScreenProvider extends ChangeNotifier {
 
   bool selectMissingOnSelectAllCheckbox() {
     for (int i = 1; i < sources.length; i++) {
-      if (!sources[i]['isSelected']) {
+      if (!sources[i].isSelected) {
         return false;
       }
     }
@@ -225,8 +226,8 @@ class ScreenProvider extends ChangeNotifier {
 
   void savePlaylist(context) {
     List<String> selectedSources = sources
-        .where((element) => element['isSelected'])
-        .map<String>((element) => element['name'])
+        .where((element) => element.isSelected)
+        .map<String>((element) => element.id)
         .toList();
 
     // Add 1s to the name, until it is unique
@@ -298,92 +299,105 @@ class PlaylistCreation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Applist playlist = ModalRoute.of(context).settings.arguments;
-    return ChangeNotifierProvider(
-      create: (context) => ScreenProvider(
-          Provider.of<SpotifyPlaylistProvider>(context, listen: false),
-          Provider.of<SlylistProvider>(context, listen: false),
-          playlist,
-          _spotifyClient),
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text("Create Playlist"),
-          ),
-          body: Consumer<ScreenProvider>(
-            builder: (context, screenProvider, child) {
-              return SizedBox.expand(
-                child: Stepper(
-                    steps: [
-                      Step(
-                        title: Text("Select Source"),
-                        content: SelectSourceStep(),
-                        isActive: screenProvider.activeStep == 0,
-                      ),
-                      Step(
-                        title: Text("Rules"),
-                        content: CreateGroupsRulesStep(),
-                        isActive: screenProvider.activeStep == 1,
-                      ),
-                      Step(
-                        title: Text("Details"),
-                        content: DetailsStep(),
-                        isActive: screenProvider.activeStep == 2,
-                      )
-                    ],
-                    type: StepperType.horizontal,
-                    currentStep: screenProvider.activeStep,
-                    onStepTapped: (index) =>
-                        setStepIfAllowed(index, screenProvider),
-                    controlsBuilder: (BuildContext context,
-                        {VoidCallback onStepContinue,
-                        VoidCallback onStepCancel}) {
-                      var backButton = FlatButton(
-                        onPressed: () => screenProvider.activeStep =
-                            screenProvider.activeStep - 1,
-                        child: const Text('BACK'),
-                      );
-                      var nextButton = FlatButton(
-                        onPressed: !screenProvider.validSteps['step_0']
-                            ? null
-                            : () => setStepIfAllowed(
-                                screenProvider.activeStep + 1, screenProvider),
-                        child: const Text('NEXT'),
-                        color: Theme.of(context).accentColor,
-                        textColor: Colors.white,
-                      );
-                      var previewButton = FlatButton(
-                        onPressed: () => print("preview"),
-                        child: const Text('PREVIEW'),
-                      );
-                      var saveButton = FlatButton(
-                        onPressed: !screenProvider.validSteps['step_2']
-                            ? null
-                            : () => screenProvider.savePlaylist(context),
-                        child: const Text('SAVE'),
-                        color: Theme.of(context).primaryColor,
-                        textColor: Colors.white,
-                      );
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Visibility(
-                              child: backButton,
-                              visible: screenProvider.activeStep != 0),
-                          Visibility(
-                              child: nextButton,
-                              visible: screenProvider.activeStep != 2),
-                          Spacer(),
-                          Visibility(
-                              child: previewButton,
-                              visible: screenProvider.activeStep == 2),
-                          Visibility(
-                              child: saveButton,
-                              visible: screenProvider.activeStep == 2)
-                        ],
-                      );
-                    }),
-              );
-            },
-          )),
+
+    return FutureBuilder<dynamic>(
+      future: Provider.of<SpotifyPlaylistProvider>(context, listen: false)
+          .initSpotifyPlaylists(
+              _spotifyClient), // function where you call your api
+      builder: (context, snapshot) {
+        if (snapshot.data != null) {
+          return ChangeNotifierProvider(
+            create: (context) => ScreenProvider(
+                Provider.of<SpotifyPlaylistProvider>(context, listen: false),
+                Provider.of<SlylistProvider>(context, listen: false),
+                playlist,
+                _spotifyClient),
+            child: Scaffold(
+                appBar: AppBar(
+                  title: Text("Create Playlist"),
+                ),
+                body: Consumer<ScreenProvider>(
+                  builder: (context, screenProvider, child) {
+                    return SizedBox.expand(
+                      child: Stepper(
+                          steps: [
+                            Step(
+                              title: Text("Select Source"),
+                              content: SelectSourceStep(),
+                              isActive: screenProvider.activeStep == 0,
+                            ),
+                            Step(
+                              title: Text("Rules"),
+                              content: CreateGroupsRulesStep(),
+                              isActive: screenProvider.activeStep == 1,
+                            ),
+                            Step(
+                              title: Text("Details"),
+                              content: DetailsStep(),
+                              isActive: screenProvider.activeStep == 2,
+                            )
+                          ],
+                          type: StepperType.horizontal,
+                          currentStep: screenProvider.activeStep,
+                          onStepTapped: (index) =>
+                              setStepIfAllowed(index, screenProvider),
+                          controlsBuilder: (BuildContext context,
+                              {VoidCallback onStepContinue,
+                              VoidCallback onStepCancel}) {
+                            var backButton = FlatButton(
+                              onPressed: () => screenProvider.activeStep =
+                                  screenProvider.activeStep - 1,
+                              child: const Text('BACK'),
+                            );
+                            var nextButton = FlatButton(
+                              onPressed: !screenProvider.validSteps['step_0']
+                                  ? null
+                                  : () => setStepIfAllowed(
+                                      screenProvider.activeStep + 1,
+                                      screenProvider),
+                              child: const Text('NEXT'),
+                              color: Theme.of(context).accentColor,
+                              textColor: Colors.white,
+                            );
+                            var previewButton = FlatButton(
+                              onPressed: () => print("preview"),
+                              child: const Text('PREVIEW'),
+                            );
+                            var saveButton = FlatButton(
+                              onPressed: !screenProvider.validSteps['step_2']
+                                  ? null
+                                  : () => screenProvider.savePlaylist(context),
+                              child: const Text('SAVE'),
+                              color: Theme.of(context).primaryColor,
+                              textColor: Colors.white,
+                            );
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Visibility(
+                                    child: backButton,
+                                    visible: screenProvider.activeStep != 0),
+                                Visibility(
+                                    child: nextButton,
+                                    visible: screenProvider.activeStep != 2),
+                                Spacer(),
+                                Visibility(
+                                    child: previewButton,
+                                    visible: screenProvider.activeStep == 2),
+                                Visibility(
+                                    child: saveButton,
+                                    visible: screenProvider.activeStep == 2)
+                              ],
+                            );
+                          }),
+                    );
+                  },
+                )),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }

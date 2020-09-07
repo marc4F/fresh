@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/services/spotify_client.dart';
 import 'package:workmanager/workmanager.dart';
@@ -29,8 +28,11 @@ void callbackDispatcher() {
         (slylist) => slylists.add(Slylist.fromJson(json.decode(slylist))));
 
     await Future.forEach(slylists, (Slylist slylist) async {
-      // If no spotify playlist is linked to slylist, create a new spotify playlist.
-      if (slylist.spotifyId == null) {
+      // If no spotify playlist is linked to slylist, or it was deleted,
+      // -> create a new spotify playlist.
+      bool isSpotifyPlaylistAvailable =
+          await spotifyClient.isPlaylistAvailable(slylist.spotifyId);
+      if (!isSpotifyPlaylistAvailable) {
         slylist.spotifyId = await spotifyClient.createSpotifyPlaylistAndGetId(
             slylist, spotifyUserId);
       }

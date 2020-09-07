@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => SlylistProvider()),
           ChangeNotifierProvider(create: (context) => TemplateProvider()),
           ChangeNotifierProvider(
-              create: (context) => SpotifyPlaylistProvider(_spotifyClient)),
+              create: (context) => SpotifyPlaylistProvider()),
         ],
         child: MaterialApp(
           title: 'Slylist',
