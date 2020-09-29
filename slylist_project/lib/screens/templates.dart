@@ -4,10 +4,18 @@ import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist.dart';
 import 'package:slylist_project/provider/template.dart';
+import 'package:slylist_project/services/data-cache.dart';
+import 'package:slylist_project/services/playlist_manager.dart';
+import 'package:slylist_project/services/spotify_client.dart';
+import 'package:workmanager/workmanager.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
 class Templates extends StatelessWidget {
+  final SpotifyClient _spotifyClient;
+
+  Templates(this._spotifyClient);
+
   @override
   Widget build(BuildContext context) {
     final title = 'Template Playlists';
@@ -20,30 +28,26 @@ class Templates extends StatelessWidget {
             title: Text(title),
           ),
           body: Consumer2<TemplateProvider, SlylistProvider>(
-              builder: (context, templateProvider,
-                      slylistProvider, child) =>
-                  buildListView(
-                      templateProvider, slylistProvider)),
+              builder: (context, templateProvider, slylistProvider, child) =>
+                  buildListView(templateProvider, slylistProvider)),
         ),
       ),
     );
   }
 
-  ListView buildListView(TemplateProvider templateProvider,
-      SlylistProvider slylistProvider) {
+  ListView buildListView(
+      TemplateProvider templateProvider, SlylistProvider slylistProvider) {
     return ListView.builder(
       itemCount: templateProvider.templates.length,
       itemBuilder: (context, index) {
-        Template templatePlaylist =
-            templateProvider.templates[index];
+        Template templatePlaylist = templateProvider.templates[index];
         // Add 1s to the name, until it is unique
 
-        void createSlylistAndGoToHomeScreen(context) {
+        Future<void> createSlylistAndGoToHomeScreen(context) async {
           String playlistName = templatePlaylist.name;
 
           void setUniqueSlylistName() {
-            List<Slylist> slylists =
-                slylistProvider.slylists;
+            List<Slylist> slylists = slylistProvider.slylists;
 
             slylists.forEach((slylist) {
               if (slylist.name == playlistName) {
@@ -55,6 +59,10 @@ class Templates extends StatelessWidget {
 
           setUniqueSlylistName();
 
+          final spotifyUserId = await DataCache().readString('spotifyUserId');
+          String spotifyId = await _spotifyClient.createSpotifyPlaylistAndGetId(
+              playlistName, templatePlaylist.isPublic, spotifyUserId);
+
           slylistProvider.createSlylist(
               playlistName,
               templatePlaylist.sources,
@@ -63,8 +71,13 @@ class Templates extends StatelessWidget {
               templatePlaylist.songLimit,
               templatePlaylist.sort,
               templatePlaylist.isPublic,
-              templatePlaylist.isSynced);
+              templatePlaylist.isSynced,
+              spotifyId);
+
           Navigator.pop(context);
+
+          await PlaylistManager(_spotifyClient, slylistProvider)
+              .updateUsersSpotify();
         }
 
         return Card(

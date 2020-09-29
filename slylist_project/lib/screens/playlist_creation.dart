@@ -9,12 +9,16 @@ import 'package:slylist_project/models/spotify_playlist.dart';
 import 'package:slylist_project/models/template.dart';
 import 'package:slylist_project/provider/slylist.dart';
 import 'package:slylist_project/screens/slylists.dart';
+import 'package:slylist_project/services/data-cache.dart';
+import 'package:slylist_project/services/playlist_manager.dart';
 import 'package:slylist_project/services/spotify_client.dart';
 import 'package:slylist_project/widgets/create_groups_rules_step.dart';
 import 'package:slylist_project/widgets/details_step.dart';
 import 'package:slylist_project/widgets/select_source_step.dart';
 import 'package:slylist_project/provider/spotify_playlist.dart';
 import 'dart:convert';
+
+import 'package:workmanager/workmanager.dart';
 
 class ScreenProvider extends ChangeNotifier {
   static const List sortings = [
@@ -224,7 +228,7 @@ class ScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void savePlaylist(context) {
+  Future<void> savePlaylist(context) async {
     List<String> selectedSources = sources
         .where((element) => element.isSelected)
         .map<String>((element) => element.id)
@@ -244,9 +248,14 @@ class ScreenProvider extends ChangeNotifier {
     // Templates are (of course) not updated, and only used for creation of new playlists.
     if (playlist != null && playlist is Slylist) {
       // Only if user renamed playlist, check for unique name
-      // If user renamed playlist, then name must be unique, and changed if not.
+      // If user renamed playlist, then name must be unique.
       if (playlist.name != playlistName) {
         setUniqueSlylistName();
+      }
+      if ((playlist.name != playlistName) ||
+          (playlist.isPublic != _isPlaylistPublic)) {
+        await _spotifyClient.updateSpotifyPlaylist(
+            (playlist as Slylist).spotifyId, playlistName, _isPlaylistPublic);
       }
       slylistProvider.updateSlylist(
           playlist,
@@ -262,6 +271,9 @@ class ScreenProvider extends ChangeNotifier {
       // Create a new playlist if it does not already exist, or the used playlist is from type template.
     } else if (playlist == null || playlist is Template) {
       setUniqueSlylistName();
+      final spotifyUserId = await DataCache().readString('spotifyUserId');
+      String spotifyId = await _spotifyClient.createSpotifyPlaylistAndGetId(
+          playlistName, _isPlaylistPublic, spotifyUserId);
       slylistProvider.createSlylist(
           playlistName,
           selectedSources,
@@ -271,13 +283,15 @@ class ScreenProvider extends ChangeNotifier {
           int.tryParse(songLimit),
           _selectedSorting,
           _isPlaylistPublic,
-          _isPlaylistSynced);
+          _isPlaylistSynced,
+          spotifyId);
     }
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => Slylists(_spotifyClient)),
       (Route<dynamic> route) => false,
     );
+    await PlaylistManager(_spotifyClient, slylistProvider).updateUsersSpotify();
   }
 }
 

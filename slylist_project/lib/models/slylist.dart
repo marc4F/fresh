@@ -16,9 +16,12 @@ class Slylist extends Applist {
       int songLimit,
       String sort,
       bool isPublic,
-      bool isSynced)
+      bool isSynced,
+      String spotifyId)
       : super(name, sources, groups, groupsMatch, songLimit, sort, isPublic,
-            isSynced);
+            isSynced) {
+    this.spotifyId = spotifyId;
+  }
 
   updateSlylist(
       String name,

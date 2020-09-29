@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slylist_project/models/slylist.dart';
 import 'package:slylist_project/provider/slylist.dart';
+import 'package:slylist_project/services/data-cache.dart';
+import 'package:slylist_project/services/playlist_manager.dart';
 import 'package:slylist_project/services/spotify_client.dart';
+import 'package:workmanager/workmanager.dart';
 
 class ScreenProvider extends ChangeNotifier {}
 
@@ -78,17 +82,28 @@ class Slylists extends StatelessWidget {
     );
   }
 
-  Future<void> _onPressedOpenDeleteDialog(context) async {
+  Future<void> _onPressedOpenDeleteDialog(
+      context, SlylistProvider slylistProvider, Slylist slylist) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Can't delete playlist"),
-          content: Text("Please use spotify, to delete playlists."),
+          title: Text("Playlist Deletion"),
+          content: Text("Are you sure you want to delete playlist?"),
           actions: <Widget>[
             FlatButton(
-              child: Text('OK'),
+              child: Text('Yes'),
+              onPressed: () async {
+                await _spotifyClient.removeSpotifyPlaylist(slylist.spotifyId);
+                slylistProvider.removeSlylist(slylist);
+                Navigator.of(context).pop();
+                await PlaylistManager(_spotifyClient, slylistProvider)
+                    .updateUsersSpotify();
+              },
+            ),
+            FlatButton(
+              child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -129,16 +144,20 @@ class Slylists extends StatelessWidget {
     );
   }
 
-  ListView buildListView(SlylistProvider p) {
+  ListView buildListView(SlylistProvider slylistProvider) {
     return ListView.builder(
-      itemCount: p.slylists.length,
+      itemCount: slylistProvider.slylists.length,
       itemBuilder: (context, index) {
         return ListTile(
+          leading: slylistProvider.isSpotifyUpdating
+              ? CircularProgressIndicator()
+              : null,
           trailing: PopupMenuButton<int>(
             onSelected: (menuValue) => (menuValue == 1)
                 ? Navigator.pushNamed(context, '/playlist_creation',
-                    arguments: p.slylists[index])
-                : _onPressedOpenDeleteDialog(context),
+                    arguments: slylistProvider.slylists[index])
+                : _onPressedOpenDeleteDialog(
+                    context, slylistProvider, slylistProvider.slylists[index]),
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 1,
@@ -150,7 +169,7 @@ class Slylists extends StatelessWidget {
               )
             ],
           ),
-          title: Text('${p.slylists[index].name}'),
+          title: Text('${slylistProvider.slylists[index].name}'),
         );
       },
     );

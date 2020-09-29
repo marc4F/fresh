@@ -8,6 +8,15 @@ import 'package:slylist_project/services/data-cache.dart';
 //Playlists that where created from our app
 class SlylistProvider extends ChangeNotifier {
   final List<Slylist> slylists = [];
+  bool _isSpotifyUpdating = false;
+
+  bool get isSpotifyUpdating => _isSpotifyUpdating;
+
+  set isSpotifyUpdating(bool isSpotifyUpdating) {
+    _isSpotifyUpdating = isSpotifyUpdating;
+    notifyListeners();
+  }
+
   final _dataCache = new DataCache();
 
   SlylistProvider() {
@@ -25,9 +34,10 @@ class SlylistProvider extends ChangeNotifier {
       int songLimit,
       String sort,
       bool isPublic,
-      bool isSynced) {
+      bool isSynced,
+      String spotifyId) {
     slylists.add(new Slylist(name, sources, groups, groupsMatch, songLimit,
-        sort, isPublic, isSynced));
+        sort, isPublic, isSynced, spotifyId));
     saveAllSlylists();
     notifyListeners();
   }
@@ -69,6 +79,12 @@ class SlylistProvider extends ChangeNotifier {
 
   removeAllSlylists() async {
     _dataCache.delete('Slylists');
+    notifyListeners();
+  }
+
+  void removeSlylist(Slylist slylist) {
+    slylists.remove(slylist);
+    saveAllSlylists();
     notifyListeners();
   }
 }

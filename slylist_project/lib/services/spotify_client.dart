@@ -110,11 +110,11 @@ class SpotifyClient {
   }
 
   Future<String> createSpotifyPlaylistAndGetId(
-      Slylist slylist, String spotifyUserId) async {
+      String name, bool isPublic, String spotifyUserId) async {
     try {
       String url = '/users/$spotifyUserId/playlists';
-      final response = await _httpClient
-          .post(url, data: {'name': slylist.name, 'public': slylist.isPublic});
+      final response =
+          await _httpClient.post(url, data: {'name': name, 'public': isPublic});
       return response.data["id"];
     } catch (e) {
       debugPrint(e.error);
@@ -136,9 +136,7 @@ class SpotifyClient {
     try {
       String url = '/playlists/$spotifyPlaylistId/followers';
       await _httpClient.delete(url);
-    } catch (e) {
-      debugPrint(e.error);
-    }
+    } catch (e) {}
   }
 
   Future<void> addTracksToSpotifyPlaylist(
@@ -188,5 +186,14 @@ class SpotifyClient {
       }
     }
     return false;
+  }
+
+  updateSpotifyPlaylist(String spotifyPlaylistId, String playlistName,
+      bool isPlaylistPublic) async {
+    try {
+      String url = '/playlists/$spotifyPlaylistId';
+      final data = {'name': playlistName, 'public': isPlaylistPublic};
+      await _httpClient.put(url, data: data);
+    } catch (e) {}
   }
 }

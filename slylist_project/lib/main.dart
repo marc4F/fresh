@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/spotify_login': (context) => SpotifyLogin(_spotifyClient),
             '/slylists': (context) => Slylists(_spotifyClient),
-            '/templates': (context) => Templates(),
+            '/templates': (context) => Templates(_spotifyClient),
             '/playlist_creation': (context) => PlaylistCreation(_spotifyClient)
           },
         ),
