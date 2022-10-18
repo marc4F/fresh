@@ -113,9 +113,9 @@ class ScreenProvider extends ChangeNotifier {
 
   _combinePlaylistsToSources(List<SpotifyPlaylist> spotifyPlaylists) {
     sources = [
-      Source('0', 'Complete Library', false, true),
-      Source('1', 'Liked Artists', false, true),
-      Source('2', 'Liked Albums', false, true),
+      Source('0', 'Songs from complete Library', false, true),
+      Source('1', 'Songs from liked Artists', false, true),
+      Source('2', 'Songs from liked Albums', false, true),
       Source('3', 'Liked Songs', false, true)
     ];
 

@@ -42,6 +42,7 @@ Future<void> main() async {
 
   // Periodic task registration
   Workmanager.registerPeriodicTask("2", "simplePeriodicTask",
+      frequency: Duration(hours: 120),
       existingWorkPolicy: ExistingWorkPolicy.replace);
 }
 

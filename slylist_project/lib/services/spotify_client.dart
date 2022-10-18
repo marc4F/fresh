@@ -83,7 +83,7 @@ class SpotifyClient {
       final response = await _httpClient.get('/me');
       return response.data["id"];
     } catch (e) {
-      debugPrint(e.error);
+      debugPrint("failed to get user id");
       return null;
     }
   }
@@ -101,7 +101,7 @@ class SpotifyClient {
           next = false;
         }
       } catch (e) {
-        debugPrint(e.error);
+        debugPrint("failed to get spotify playlists");
         return null;
       }
     }
@@ -117,7 +117,7 @@ class SpotifyClient {
           await _httpClient.post(url, data: {'name': name, 'public': isPublic});
       return response.data["id"];
     } catch (e) {
-      debugPrint(e.error);
+      debugPrint("failed to create spotify playlist");
       return null;
     }
   }
@@ -128,7 +128,7 @@ class SpotifyClient {
       final data = {'uris': []};
       await _httpClient.put(url, data: data);
     } catch (e) {
-      debugPrint(e.error);
+      debugPrint("failed to clear spotify playlist");
     }
   }
 
@@ -136,21 +136,23 @@ class SpotifyClient {
     try {
       String url = '/playlists/$spotifyPlaylistId/followers';
       await _httpClient.delete(url);
-    } catch (e) {}
+    } catch (e) {
+      debugPrint("failed to remove spotify playlist");
+    }
   }
 
   Future<void> addTracksToSpotifyPlaylist(
-      String spotifyPlaylistId, List<String> tracks) async {
+      String spotifyPlaylistId, List tracks) async {
     try {
       final tracksPartitioned = partition(tracks, 50);
-      await Future.forEach(tracksPartitioned,
-          (List<String> tracksPartition) async {
+      await Future.forEach(tracksPartitioned, (List tracksPartition) async {
         String url = '/playlists/$spotifyPlaylistId/tracks';
         final data = {'uris': tracksPartition};
         await _httpClient.post(url, data: data);
+        await Future.delayed(Duration(milliseconds: 100));
       });
     } catch (e) {
-      debugPrint(e.error);
+      debugPrint("failed to add tracks to spotify playlist");
     }
   }
 
@@ -163,16 +165,119 @@ class SpotifyClient {
         final response = await _httpClient.get(url);
         url = response.data["next"];
         items.add(response.data["items"]);
+        await Future.delayed(Duration(milliseconds: 50));
         if (url == null || url == "") {
           next = false;
         }
       } catch (e) {
-        debugPrint(e.error);
-        return null;
+        debugPrint("failed to get tracks of user");
+        next = false;
       }
     }
     //Flatten items array which contains n arrays
     return items.expand((i) => i).toList();
+  }
+
+  Future<List<dynamic>> getAlbumTracks(String albumId) async {
+    bool next = true;
+    String url = '/albums/$albumId/tracks';
+    List tracks = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        url = response.data["next"];
+        List items = response.data["items"].toList();
+        items = items.map((i) {
+          return i["uri"];
+        }).toList();
+        tracks.add(items);
+        await Future.delayed(Duration(milliseconds: 50));
+        if (url == null || url == "") {
+          next = false;
+        }
+      } catch (e) {
+        debugPrint("failed to get artists tracks");
+        next = false;
+      }
+    }
+    //Flatten items array which contains n arrays
+    return tracks.expand((i) => i).toList();
+  }
+
+  Future<List<dynamic>> getUsersFollowedArtists() async {
+    bool next = true;
+    String url = '/me/following?type=artist';
+    List artists = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        var result = response.data["artists"];
+        url = result["next"];
+        List items = result["items"].toList();
+        items = items.map((i) {
+          return i["id"];
+        }).toList();
+        artists.add(items);
+        if (url == null || url == "") {
+          next = false;
+        }
+      } catch (e) {
+        debugPrint("failed to get users followed artists");
+        next = false;
+      }
+    }
+    //Flatten artists array which contains n arrays
+    return artists.expand((i) => i).toList();
+  }
+
+  Future<List<dynamic>> getArtistsAlbums(String artistId) async {
+    bool next = true;
+    String url = '/artists/$artistId/albums?include_groups=album,single';
+    List albums = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        url = response.data["next"];
+        albums.add(response.data["items"]);
+        await Future.delayed(Duration(milliseconds: 50));
+        if (url == null || url == "") {
+          next = false;
+        }
+      } catch (e) {
+        debugPrint("failed to get artists albums");
+        debugPrint(e.error);
+        next = false;
+      }
+    }
+    //Flatten artists array which contains n arrays
+    return albums.expand((i) => i).toList();
+  }
+
+  Future<List<dynamic>> getArtistsTracks(String artistName) async {
+    bool next = true;
+    String encodedArtistName = Uri.encodeComponent(artistName);
+    String url = '/search?q=$encodedArtistName&type=track';
+    List tracks = [];
+    while (next) {
+      try {
+        final response = await _httpClient.get(url);
+        var result = response.data["tracks"];
+        url = result["next"];
+        List items = result["items"].toList();
+        items = items.map((i) {
+          return i["id"];
+        }).toList();
+        tracks.add(items);
+        if (url == null || url == "") {
+          next = false;
+        }
+      } catch (e) {
+        debugPrint("failed to get artists tracks");
+        next = false;
+      }
+    }
+    //Flatten tracks array which contains n arrays
+    return tracks.expand((i) => i).toList();
   }
 
   Future<bool> isPlaylistAvailable(String spotifyPlaylistId) async {
@@ -194,6 +299,8 @@ class SpotifyClient {
       String url = '/playlists/$spotifyPlaylistId';
       final data = {'name': playlistName, 'public': isPlaylistPublic};
       await _httpClient.put(url, data: data);
-    } catch (e) {}
+    } catch (e) {
+      debugPrint("failed to update spotify playlist");
+    }
   }
 }
