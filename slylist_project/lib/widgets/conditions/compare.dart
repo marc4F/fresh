@@ -17,8 +17,7 @@ class Compare extends StatelessWidget {
       var condition =
           rule.conditions.firstWhere((condition) => condition['type'] == id);
       if (condition['value'] == null) condition['value'] = "is";
-      return FlatButton(
-        color: Theme.of(context).colorScheme.ruleButton,
+      return TextButton(
         child: Text('${condition['value']}', overflow: TextOverflow.ellipsis),
         onPressed: () {
           showModalBottomSheet<void>(

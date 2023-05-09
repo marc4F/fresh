@@ -16,14 +16,16 @@ class CreateGroupsRulesStep extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
-          FlatButton(
+          TextButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              ),
               onPressed: () => {
                     (screenProvider.match == 'MATCH ANY')
                         ? screenProvider.match = 'MATCH ALL'
                         : screenProvider.match = 'MATCH ANY'
                   },
-              child: Text('${screenProvider.match}'),
-              textColor: Theme.of(context).accentColor),
+              child: Text('${screenProvider.match}')),
           ListView.builder(
             primary: false,
             shrinkWrap: true,
@@ -36,11 +38,10 @@ class CreateGroupsRulesStep extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     ListTile(
-                      trailing: FlatButton(
+                      trailing: TextButton(
                           onPressed: () =>
                               screenProvider.changeMatchForGroup(group),
-                          child: Text('${group.match}'),
-                          textColor: Theme.of(context).accentColor),
+                          child: Text('${group.match}')),
                       title: Text('Group'),
                     ),
                     ListView.builder(
@@ -58,8 +59,9 @@ class CreateGroupsRulesStep extends StatelessWidget {
                             onDismissed: (direction) {
                               screenProvider.removeRule(group, rule.id);
                               // Then show a snackbar.
-                              Scaffold.of(context).showSnackBar(SnackBar(
-                                  content: Text('"${rule.name}" removed')));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text('"${rule.name}" removed')));
                             },
                             background: Container(
                                 color: Colors.red,
@@ -90,17 +92,15 @@ class CreateGroupsRulesStep extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Row(
                         children: <Widget>[
-                          FlatButton.icon(
+                          TextButton.icon(
                               label: const Text('RULE'),
                               icon: Icon(Icons.add),
-                              textColor: Theme.of(context).accentColor,
                               onPressed: () => screenProvider.addRule(group)),
                           Spacer(),
                           Visibility(
                             visible: (groupIndex != 0) ? true : false,
-                            child: FlatButton.icon(
+                            child: TextButton.icon(
                               label: const Text('GROUP'),
-                              textColor: Colors.red,
                               icon: Icon(Icons.delete),
                               onPressed: () =>
                                   screenProvider.removeGroup(group),
@@ -117,7 +117,7 @@ class CreateGroupsRulesStep extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Center(
-              child: OutlineButton.icon(
+              child: OutlinedButton.icon(
                   onPressed: () => screenProvider.addGroup(),
                   icon: Icon(Icons.add),
                   label: Text('GROUP')),
@@ -131,8 +131,7 @@ class CreateGroupsRulesStep extends StatelessWidget {
   List<Widget> buildRule(
       BuildContext context, ScreenProvider screenProvider, Rule rule) {
     List<Widget> ruleWidgets = [];
-    Widget ruleSelection = FlatButton(
-      color: Theme.of(context).colorScheme.ruleButton,
+    Widget ruleSelection = TextButton(
       child: Text('${rule.name}', overflow: TextOverflow.ellipsis),
       onPressed: () {
         showModalBottomSheet<void>(

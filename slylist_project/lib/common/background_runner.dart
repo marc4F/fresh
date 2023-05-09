@@ -6,7 +6,7 @@ import 'package:workmanager/workmanager.dart';
 import 'package:slylist_project/services/data-cache.dart';
 
 void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
+  Workmanager().executeTask((task, inputData) async {
     final spotifyClient = SpotifyClient();
     final dataCache = DataCache();
     final accessToken = await dataCache.readString('accessToken');

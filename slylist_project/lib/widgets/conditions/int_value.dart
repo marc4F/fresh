@@ -21,13 +21,13 @@ class IntValue extends StatelessWidget {
         value = condition['value'];
       }
       return TextFormField(
-          onChanged: (String value) => screenProvider.changeConditionValue(
-              rule, 'intValue', value),
+          onChanged: (String value) =>
+              screenProvider.changeConditionValue(rule, 'intValue', value),
           keyboardType: TextInputType.number,
           decoration: InputDecoration(hintText: 'Number', isDense: true),
           initialValue: value,
           inputFormatters: <TextInputFormatter>[
-            WhitelistingTextInputFormatter.digitsOnly
+            FilteringTextInputFormatter.digitsOnly
           ]);
     });
   }

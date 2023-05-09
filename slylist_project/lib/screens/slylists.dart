@@ -22,17 +22,16 @@ class Slylists extends StatelessWidget {
       create: (context) => ScreenProvider(),
       child: Consumer<ScreenProvider>(
         builder: (context, p, child) => Scaffold(
-          floatingActionButton: Container(
-            height: 100,
-            width: 100,
-            child: FittedBox(
-              child: FloatingActionButton(
-                  tooltip: 'Select Playlist Type',
-                  child: Icon(Icons.playlist_add),
-                  onPressed: () async => _onPressedOpenPlaylistDialog(context)),
-              //onPressed: () async => this.spotifyClient.test()),
+          persistentFooterButtons: [
+            TextButton(
+                child: Text('Create Playlist'),
+                onPressed: () async => _onPressedOpenPlaylistDialog(context)),
+            Consumer<SlylistProvider>(
+              builder: (context, p, child) => TextButton(
+                  child: Text('Refresh Playlists'),
+                  onPressed: () async => _onPressedRefreshPlaylists(p)),
             ),
-          ),
+          ],
           appBar: AppBar(
             title: Text(title),
           ),
@@ -62,14 +61,14 @@ class Slylists extends StatelessWidget {
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text('PLAYLIST FROM TEMPLATE'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/templates');
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text('PLAYLIST FROM CUSTOM RULES'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -82,6 +81,11 @@ class Slylists extends StatelessWidget {
     );
   }
 
+  Future<void> _onPressedRefreshPlaylists(
+      SlylistProvider slylistProvider) async {
+    await PlaylistManager(_spotifyClient, slylistProvider).updateUsersSpotify();
+  }
+
   Future<void> _onPressedOpenDeleteDialog(
       context, SlylistProvider slylistProvider, Slylist slylist) async {
     return showDialog<void>(
@@ -92,7 +96,7 @@ class Slylists extends StatelessWidget {
           title: Text("Playlist Deletion"),
           content: Text("Are you sure you want to delete playlist?"),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text('Yes'),
               onPressed: () async {
                 await _spotifyClient.removeSpotifyPlaylist(slylist.spotifyId);
@@ -102,7 +106,7 @@ class Slylists extends StatelessWidget {
                     .updateUsersSpotify();
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();

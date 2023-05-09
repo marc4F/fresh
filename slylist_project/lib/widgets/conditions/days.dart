@@ -28,7 +28,7 @@ class Days extends StatelessWidget {
           decoration: InputDecoration(hintText: 'Days', isDense: true),
           initialValue: value,
           inputFormatters: <TextInputFormatter>[
-            WhitelistingTextInputFormatter.digitsOnly
+            FilteringTextInputFormatter.digitsOnly
           ]);
     });
   }

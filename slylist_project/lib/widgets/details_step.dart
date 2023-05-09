@@ -18,7 +18,7 @@ class DetailsStep extends StatelessWidget {
                     screenProvider.playlistName = playlistName;
                     if (playlistName != '') {
                       screenProvider.updateValidSteps('step_2', true);
-                    }else{
+                    } else {
                       screenProvider.updateValidSteps('step_2', false);
                     }
                   },
@@ -51,7 +51,7 @@ class DetailsStep extends StatelessWidget {
                   initialValue: screenProvider.songLimit,
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
-                    WhitelistingTextInputFormatter.digitsOnly
+                    FilteringTextInputFormatter.digitsOnly
                   ]),
             ),
             Padding(

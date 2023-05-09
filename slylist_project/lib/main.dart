@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slylist_project/common/background_runner.dart';
@@ -19,8 +21,9 @@ import 'package:slylist_project/services/data-cache.dart';
 
 import 'package:slylist_project/services/spotify_client.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
-String _accessToken, _refreshToken;
+String _accessToken, _refreshToken, _spotifyUserId;
 final _spotifyClient = SpotifyClient();
 
 Future<void> main() async {
@@ -28,22 +31,25 @@ Future<void> main() async {
   final _dataCache = new DataCache();
   _accessToken = await _dataCache.readString('accessToken');
   _refreshToken = await _dataCache.readString('refreshToken');
+  _spotifyUserId = await _dataCache.readString('spotifyUserId');
   if ((_accessToken != null) && (_refreshToken != null)) {
     _spotifyClient.setInitialTokens(_accessToken, _refreshToken);
   }
 
   runApp(MyApp());
 
-  Workmanager.initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode:
-          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-      );
+  if (!kIsWeb) {
+    Workmanager().initialize(
+        callbackDispatcher, // The top level function, aka callbackDispatcher
+        isInDebugMode:
+            true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+        );
 
-  // Periodic task registration
-  Workmanager.registerPeriodicTask("2", "simplePeriodicTask",
-      frequency: Duration(hours: 120),
-      existingWorkPolicy: ExistingWorkPolicy.replace);
+    // Periodic task registration
+    Workmanager().registerPeriodicTask("2", "simplePeriodicTask",
+        frequency: Duration(hours: 120),
+        existingWorkPolicy: ExistingWorkPolicy.replace);
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -65,7 +71,9 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Slylist',
           theme: appTheme,
-          initialRoute: (_accessToken == null) ? '/spotify_login' : '/slylists',
+          initialRoute: (_accessToken == null) || (_spotifyUserId == null)
+              ? '/spotify_login'
+              : '/slylists',
           routes: {
             '/spotify_login': (context) => SpotifyLogin(_spotifyClient),
             '/slylists': (context) => Slylists(_spotifyClient),

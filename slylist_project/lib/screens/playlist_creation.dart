@@ -355,35 +355,30 @@ class PlaylistCreation extends StatelessWidget {
                           currentStep: screenProvider.activeStep,
                           onStepTapped: (index) =>
                               setStepIfAllowed(index, screenProvider),
-                          controlsBuilder: (BuildContext context,
-                              {VoidCallback onStepContinue,
-                              VoidCallback onStepCancel}) {
-                            var backButton = FlatButton(
+                          controlsBuilder:
+                              (BuildContext context, ControlsDetails controls) {
+                            var backButton = TextButton(
                               onPressed: () => screenProvider.activeStep =
                                   screenProvider.activeStep - 1,
                               child: const Text('BACK'),
                             );
-                            var nextButton = FlatButton(
+                            var nextButton = TextButton(
                               onPressed: !screenProvider.validSteps['step_0']
                                   ? null
                                   : () => setStepIfAllowed(
                                       screenProvider.activeStep + 1,
                                       screenProvider),
                               child: const Text('NEXT'),
-                              color: Theme.of(context).accentColor,
-                              textColor: Colors.white,
                             );
-                            var previewButton = FlatButton(
+                            var previewButton = TextButton(
                               onPressed: () => print("preview"),
                               child: const Text('PREVIEW'),
                             );
-                            var saveButton = FlatButton(
+                            var saveButton = TextButton(
                               onPressed: !screenProvider.validSteps['step_2']
                                   ? null
                                   : () => screenProvider.savePlaylist(context),
                               child: const Text('SAVE'),
-                              color: Theme.of(context).primaryColor,
-                              textColor: Colors.white,
                             );
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.start,

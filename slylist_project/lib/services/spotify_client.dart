@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:slylist_project/common/const.dart';
@@ -14,7 +13,7 @@ class SpotifyClient {
           ..options.baseUrl = 'https://api.spotify.com/v1'
           ..interceptors.add(_fresh);
 
-  static final _fresh = Fresh<OAuth2Token>(
+  static final _fresh = Fresh.oAuth2(
       tokenStorage: InMemoryTokenStorage<OAuth2Token>(),
       refreshToken: (token, client) async {
         debugPrint('refreshing token...');
@@ -24,7 +23,7 @@ class SpotifyClient {
         map['refresh_token'] = token.refreshToken;
 
         http.Response response = await http.post(
-          SlylistConst.spotifyTokenApi,
+          Uri.parse(SlylistConst.spotifyTokenApi),
           body: map,
         );
         var body = json.decode(response.body);
@@ -48,8 +47,20 @@ class SpotifyClient {
           refreshToken: refreshToken,
         );
       },
+      tokenHeader: (OAuth2Token token) {
+        if (token.accessToken == '') {
+          return {};
+        }
+        var tokenType = token.tokenType;
+        tokenType =
+            tokenType.replaceFirst(tokenType[0], tokenType[0].toUpperCase());
+        return {'Authorization': '$tokenType ${token.accessToken}'};
+      },
       shouldRefresh: (response) {
-        var body = json.decode(response.toString());
+        if (response.toString() == '') {
+          return false;
+        }
+        var body = jsonDecode(response.toString());
         if ((body["error"] != null) &&
             (body["error"]["status"] == 401) &&
             (body["error"]["message"] == "The access token expired")) {
